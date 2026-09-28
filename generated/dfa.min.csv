@@ -1,0 +1,237 @@
+state,token,kind,symbols,next
+0,,,"\t \n \r SP",2
+0,,,"!",3
+0,,,"(",4
+0,,,")",5
+0,,,"*",6
+0,,,"+",7
+0,,,",",8
+0,,,"-",9
+0,,,"/",10
+0,,,"0",11
+0,,,"1-9",12
+0,,,":",13
+0,,,";",14
+0,,,"<",15
+0,,,"=",16
+0,,,">",17
+0,,,"A-Z _ b-d g h j k m p q s v x-z",18
+0,,,"[",19
+0,,,"]",20
+0,,,"a",21
+0,,,"e",22
+0,,,"f",23
+0,,,"i",24
+0,,,"l",25
+0,,,"n",26
+0,,,"o",27
+0,,,"r",28
+0,,,"t",29
+0,,,"u",30
+0,,,"w",31
+0,,,"{",32
+0,,,"|",33
+0,,,"}",34
+1,TRAP,,,
+2,WS,skip,"\t \n \r SP",2
+3,,,"=",35
+4,LPAREN,token,,
+5,RPAREN,token,,
+6,STAR,token,,
+7,PLUS,token,,
+8,COMMA,token,,
+9,MINUS,token,">",36
+10,SLASH,token,"/",37
+11,INT,token,"0-9",38
+12,INT,token,"0-9",12
+13,COLON,token,,
+14,SEMI,token,,
+15,LT,token,"=",39
+16,ASSIGN,token,"=",40
+16,ASSIGN,token,">",41
+17,GT,token,"=",42
+18,IDENT,token,"0-9 A-Z _ a-z",18
+19,LBRACKET,token,,
+20,RBRACKET,token,,
+21,IDENT,token,"0-9 A-Z _ a-m o-r t-z",18
+21,IDENT,token,"n",43
+21,IDENT,token,"s",44
+22,IDENT,token,"0-9 A-Z _ a-k m o-w y z",18
+22,IDENT,token,"l",45
+22,IDENT,token,"n",46
+22,IDENT,token,"x",47
+23,IDENT,token,"0-9 A-Z _ b-n p-t v-z",18
+23,IDENT,token,"a",48
+23,IDENT,token,"o",49
+23,IDENT,token,"u",50
+24,IDENT,token,"0-9 A-Z _ a-e g-m o-z",18
+24,IDENT,token,"f",51
+24,IDENT,token,"n",52
+25,IDENT,token,"0-9 A-Z _ a-d f-z",18
+25,IDENT,token,"e",53
+26,IDENT,token,"0-9 A-Z _ a-n p-z",18
+26,IDENT,token,"o",54
+27,IDENT,token,"0-9 A-Z _ a-q s-z",18
+27,IDENT,token,"r",55
+28,IDENT,token,"0-9 A-Z _ a-d f-z",18
+28,IDENT,token,"e",56
+29,IDENT,token,"0-9 A-Z _ a-q s-z",18
+29,IDENT,token,"r",57
+30,IDENT,token,"0-9 A-Z _ a-r t-z",18
+30,IDENT,token,"s",58
+31,IDENT,token,"0-9 A-Z _ a-g i-z",18
+31,IDENT,token,"h",59
+32,LBRACE,token,,
+33,BAR,token,,
+34,RBRACE,token,,
+35,NE,token,,
+36,ARROW,token,,
+37,COMMENT,skip,"x00-\t x0B x0C x0E-x7F",37
+38,BAD_INT,error,"0-9",38
+39,LE,token,,
+40,EQ,token,,
+41,FATARROW,token,,
+42,GE,token,,
+43,IDENT,token,"0-9 A-Z _ a-c e-z",18
+43,IDENT,token,"d",60
+44,IDENT,token,"0-9 A-Z _ a-r t-z",18
+44,IDENT,token,"s",61
+45,IDENT,token,"0-9 A-Z _ a-r t-z",18
+45,IDENT,token,"s",62
+46,IDENT,token,"0-9 A-Z _ a-r t-z",18
+46,IDENT,token,"s",63
+47,IDENT,token,"0-9 A-Z _ a-h j-z",18
+47,IDENT,token,"i",64
+48,IDENT,token,"0-9 A-Z _ a-k m-z",18
+48,IDENT,token,"l",65
+49,IDENT,token,"0-9 A-Z _ a-q s-z",18
+49,IDENT,token,"r",66
+50,IDENT,token,"0-9 A-Z _ a-m o-z",18
+50,IDENT,token,"n",67
+51,IF,token,"0-9 A-Z _ a-z",18
+52,IDENT,token,"0-9 A-Z _ a-s u w-z",18
+52,IDENT,token,"t",68
+52,IDENT,token,"v",69
+53,IDENT,token,"0-9 A-Z _ a-m o-z",18
+53,IDENT,token,"n",70
+54,IDENT,token,"0-9 A-Z _ a-s u-z",18
+54,IDENT,token,"t",71
+55,OR,token,"0-9 A-Z _ a-z",18
+56,IDENT,token,"0-9 A-Z _ a-p r s u-z",18
+56,IDENT,token,"q",72
+56,IDENT,token,"t",73
+57,IDENT,token,"0-9 A-Z _ a-t v-z",18
+57,IDENT,token,"u",74
+58,IDENT,token,"0-9 A-Z _ a-d f-z",18
+58,IDENT,token,"e",75
+59,IDENT,token,"0-9 A-Z _ a-h j-z",18
+59,IDENT,token,"i",76
+60,AND,token,"0-9 A-Z _ a-z",18
+61,IDENT,token,"0-9 A-Z _ a-d f-t v-z",18
+61,IDENT,token,"e",77
+61,IDENT,token,"u",78
+62,IDENT,token,"0-9 A-Z _ a-d f-z",18
+62,IDENT,token,"e",79
+63,IDENT,token,"0-9 A-Z _ a-t v-z",18
+63,IDENT,token,"u",80
+64,IDENT,token,"0-9 A-Z _ a-r t-z",18
+64,IDENT,token,"s",81
+65,IDENT,token,"0-9 A-Z _ a-r t-z",18
+65,IDENT,token,"s",82
+66,IDENT,token,"0-9 A-Z _ b-z",18
+66,IDENT,token,"a",83
+67,IDENT,token,"0-9 A-Z _ a b d-z",18
+67,IDENT,token,"c",84
+68,TYPE_INT,token,"0-9 A-Z _ a-z",18
+69,IDENT,token,"0-9 A-Z _ b-z",18
+69,IDENT,token,"a",85
+70,IDENT,token,"0-9 A-Z _ a-f h-z",18
+70,IDENT,token,"g",86
+71,NOT,token,"0-9 A-Z _ a-z",18
+72,IDENT,token,"0-9 A-Z _ a-t v-z",18
+72,IDENT,token,"u",87
+73,IDENT,token,"0-9 A-Z _ a-t v-z",18
+73,IDENT,token,"u",88
+74,IDENT,token,"0-9 A-Z _ a-d f-z",18
+74,IDENT,token,"e",89
+75,IDENT,token,"0-9 A-Z _ a-r t-z",18
+75,IDENT,token,"s",90
+76,IDENT,token,"0-9 A-Z _ a-k m-z",18
+76,IDENT,token,"l",91
+77,IDENT,token,"0-9 A-Z _ a-q s-z",18
+77,IDENT,token,"r",92
+78,IDENT,token,"0-9 A-Z _ a-l n-z",18
+78,IDENT,token,"m",93
+79,ELSE,token,"0-9 A-Z _ a-z",18
+80,IDENT,token,"0-9 A-Z _ a-q s-z",18
+80,IDENT,token,"r",94
+81,IDENT,token,"0-9 A-Z _ a-s u-z",18
+81,IDENT,token,"t",95
+82,IDENT,token,"0-9 A-Z _ a-d f-z",18
+82,IDENT,token,"e",96
+83,IDENT,token,"0-9 A-Z _ a-k m-z",18
+83,IDENT,token,"l",97
+84,IDENT,token,"0-9 A-Z _ a-s u-z",18
+84,IDENT,token,"t",98
+85,IDENT,token,"0-9 A-Z _ a-q s-z",18
+85,IDENT,token,"r",99
+86,IDENT,token,"0-9 A-Z _ a-s u-z",18
+86,IDENT,token,"t",100
+87,IDENT,token,"0-9 A-Z _ a-h j-z",18
+87,IDENT,token,"i",101
+88,IDENT,token,"0-9 A-Z _ a-q s-z",18
+88,IDENT,token,"r",102
+89,TRUE,token,"0-9 A-Z _ a-z",18
+90,USES,token,"0-9 A-Z _ a-z",18
+91,IDENT,token,"0-9 A-Z _ a-d f-z",18
+91,IDENT,token,"e",103
+92,IDENT,token,"0-9 A-Z _ a-s u-z",18
+92,IDENT,token,"t",104
+93,IDENT,token,"0-9 A-Z _ a-d f-z",18
+93,IDENT,token,"e",105
+94,IDENT,token,"0-9 A-Z _ a-d f-z",18
+94,IDENT,token,"e",106
+95,IDENT,token,"0-9 A-Z _ a-r t-z",18
+95,IDENT,token,"s",107
+96,FALSE,token,"0-9 A-Z _ a-z",18
+97,IDENT,token,"0-9 A-Z _ a-k m-z",18
+97,IDENT,token,"l",108
+98,IDENT,token,"0-9 A-Z _ a-h j-z",18
+98,IDENT,token,"i",109
+99,IDENT,token,"0-9 A-Z _ a-h j-z",18
+99,IDENT,token,"i",110
+100,IDENT,token,"0-9 A-Z _ a-g i-z",18
+100,IDENT,token,"h",111
+101,IDENT,token,"0-9 A-Z _ a-q s-z",18
+101,IDENT,token,"r",112
+102,IDENT,token,"0-9 A-Z _ a-m o-z",18
+102,IDENT,token,"n",113
+103,WHILE,token,"0-9 A-Z _ a-z",18
+104,ASSERT,token,"0-9 A-Z _ a-z",18
+105,ASSUME,token,"0-9 A-Z _ a-z",18
+106,IDENT,token,"0-9 A-Z _ a-r t-z",18
+106,IDENT,token,"s",114
+107,EXISTS,token,"0-9 A-Z _ a-z",18
+108,FORALL,token,"0-9 A-Z _ a-z",18
+109,IDENT,token,"0-9 A-Z _ a-n p-z",18
+109,IDENT,token,"o",115
+110,IDENT,token,"0-9 A-Z _ b-z",18
+110,IDENT,token,"a",116
+111,LENGTH,token,"0-9 A-Z _ a-z",18
+112,IDENT,token,"0-9 A-Z _ a-d f-z",18
+112,IDENT,token,"e",117
+113,IDENT,token,"0-9 A-Z _ a-r t-z",18
+113,IDENT,token,"s",118
+114,ENSURES,token,"0-9 A-Z _ a-z",18
+115,IDENT,token,"0-9 A-Z _ a-m o-z",18
+115,IDENT,token,"n",119
+116,IDENT,token,"0-9 A-Z _ a-m o-z",18
+116,IDENT,token,"n",120
+117,IDENT,token,"0-9 A-Z _ a-r t-z",18
+117,IDENT,token,"s",121
+118,RETURNS,token,"0-9 A-Z _ a-z",18
+119,FUNCTION,token,"0-9 A-Z _ a-z",18
+120,IDENT,token,"0-9 A-Z _ a-s u-z",18
+120,IDENT,token,"t",122
+121,REQUIRES,token,"0-9 A-Z _ a-z",18
+122,INVARIANT,token,"0-9 A-Z _ a-z",18
