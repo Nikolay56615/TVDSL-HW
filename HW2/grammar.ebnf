@@ -1,0 +1,79 @@
+(* Final Funny grammar for HW2. IDENT/INT and keywords come from HW1.
+   EBNF: [...] optional; {...} repetition; | alternatives.
+   Comments/whitespace are skipped; a module must contain a declaration.
+   The expression grammar is factored to share arithmetic/predicate parentheses.
+   Category constraints below are checked after construction of an expression.
+   No backtracking or speculative reparsing is used.
+*)
+
+module          = declaration { declaration } EOF ;
+declaration     = [ "function" ] IDENT "(" [ parameters ] ")" declarationTail ;
+declarationTail = "=>" predicate [ ";" ]
+                | [ "requires" predicate ] "returns" results
+                  [ "requires" predicate ] [ "ensures" predicate ]
+                  [ "uses" locals ] statement ;
+(* "function" is only allowed on functions; requires appears at most once.
+   The preferred order is requires before returns, as in funny.ru.md.
+   requires after returns is accepted for compatible teaching examples.
+*)
+
+parameters      = variableDef { "," variableDef } ;
+results         = variableDef { "," variableDef } ;
+variableDef     = IDENT ":" variableType ;
+variableType    = "int" [ "[" "]" ] ;
+locals          = localDef { "," localDef } ;
+localDef        = IDENT [ ":" variableType ] ;
+
+statement       = assignment | conditional | loop | block
+                | "assert" predicate ";" | "assume" predicate ";" ;
+block           = "{" { statement } "}" ;
+assignment      = IDENT assignmentTail ;
+assignmentTail  = { "[" arithmetic "]" } "=" arithmetic ";"
+                | "," IDENT { "," IDENT } "=" arithmetic ";" ;
+conditional     = "if" "(" condition ")" statement [ "else" statement ] ;
+loop            = "while" "(" condition ")" [ "invariant" predicate ] statement ;
+(* An else binds to the nearest unfinished if. The optional else introduces
+   a FIRST/FOLLOW conflict; the parser resolves it by immediately consuming else.
+   The complete statement grammar is therefore not claimed to be strict LL(1).
+*)
+
+arithmetic      = expression ;
+condition       = expression ;
+predicate       = expression ;
+expression      = implication ;
+implication     = disjunction [ ("->" | "→") implication ] ;
+disjunction     = conjunction { "or" conjunction } ;
+conjunction     = negation { "and" negation } ;
+negation        = "not" negation | comparison ;
+comparison      = addition [ comparisonOp addition ] ;
+comparisonOp    = "==" | "!=" | "<=" | ">=" | "<" | ">" ;
+addition        = multiplication { ("+" | "-") multiplication } ;
+multiplication  = unary { ("*" | "/") unary } ;
+unary           = "-" unary | primary ;
+primary         = INT | "true" | "false" | quantifier
+                | "(" expression ")" | IDENT identifierTail | lengthCall ;
+identifierTail  = "(" [ arguments ] ")" | { "[" arithmetic "]" } ;
+lengthCall      = "length" "(" [ arguments ] ")" ;
+arguments       = arithmetic { "," arithmetic } ;
+quantifier      = ("forall" | "exists") "(" variableDef "|" predicate ")" ;
+
+(* Category constraints, before name/type analysis (HW3):
+   - Arithmetic: INT, Name, Call, Index, unary -, binary + - * / only.
+   - Boolean: Bool, comparison of arithmetic expressions, not/and/or/->,
+     formula Call, and (in predicates only) forall/exists.
+   - Plain arithmetic is not a condition/predicate. length is arithmetic only.
+   - Calls in executable conditions are rejected: formula references are predicates.
+   - Arguments and indexes are arithmetic; comparisons cannot be chained.
+   - Tuple assignment has only Name targets and a Call right-hand side;
+     parentheses around the Call are permitted, e.g. x,y=(f()).
+   - Index chains on Name targets are accepted for nested update sugar.
+   - Optional contracts are absent clauses, not empty expressions after keywords.
+   - requires defaults to true; ensures to false; invariant to true.
+   - Array assignment is lowered to functional ArrayUpdate inside Assign.
+   - + - * / and/or associate left; -> associates right; comparison non-associative.
+   - Highest to lowest: unary -, * /, + -, comparison, not, and, or, ->.
+   - Only int/int[] declared types; no var statement or Boolean variables.
+   - Identifier underscores follow HW1. Identifiers use ASCII.
+     Implication accepts both -> and →, with normalized AST operator ->.
+     Other Unicode is permitted inside skipped comments only.
+*)

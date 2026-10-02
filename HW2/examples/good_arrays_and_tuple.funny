@@ -1,0 +1,23 @@
+minmax(a:int[]) requires length(a) > 0 returns lo:int, hi:int
+    uses i:int
+{
+    lo = a[0];
+    hi = a[0];
+    i = 1;
+    while (i < length(a)) {
+        if (a[i] < lo) lo = a[i];
+        if (a[i] > hi) hi = a[i];
+        i = i + 1;
+    }
+}
+
+normalize(a:int[]) requires length(a) >= 2 returns b:int[]
+    uses lo:int, hi:int
+{
+    b = a; // Копирование массива.
+    lo, hi = minmax(b);
+    if (lo != hi) {
+        b[0] = lo;
+        b[1] = hi;
+    }
+}

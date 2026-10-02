@@ -1,0 +1,15 @@
+// Сумма первых n неотрицательных целых чисел.
+sum(n:int) requires n >= 0 returns r:int
+    ensures r == n * (n - 1) / 2
+    uses i:int
+{
+    i = 0;
+    r = 0;
+    while (i < n)
+        invariant 0 <= i and i <= n and r == i * (i - 1) / 2
+    {
+        r = r + i;
+        i = i + 1;
+    }
+    assert i == n;
+}
