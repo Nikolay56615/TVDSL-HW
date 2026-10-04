@@ -64,9 +64,9 @@ def cmd_test(args):
         actual = result.to_dict()
         errors = []
         if result.ok != case["valid"]:
-            errors.append("valid: expected %r, got %r" % (case["valid"], result.ok))
+            errors.append("valid: ожидалось %r, получено %r" % (case["valid"], result.ok))
         if "ast" in case and result.ast != case["ast"]:
-            errors.append("AST differs from the expected tree")
+            errors.append("AST не совпадает с эталонным деревом")
         if "diagnostics" in case:
             expected = case["diagnostics"]
             diagnostics = actual["diagnostics"]
@@ -75,7 +75,7 @@ def cmd_test(args):
                     for key, value in wanted.items())
                 for wanted, found in zip(expected, diagnostics)
             ):
-                errors.append("diagnostics: expected %r, got %r" % (expected, diagnostics))
+                errors.append("diagnostics: ожидалось %r, получено %r" % (expected, diagnostics))
         failed += bool(errors)
         if errors or args.verbose:
             print("%s  %s" % ("FAIL" if errors else "PASS", case["name"]))
@@ -93,23 +93,23 @@ def main():
             stream.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(prog="funnyparse", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    command = sub.add_parser("parse", help="parse a file or --text; output AST and diagnostics")
+    command = sub.add_parser("parse", help="разобрать файл или --text; вывести AST и диагностику")
     command.add_argument("file", nargs="?")
     command.add_argument("--text")
     command.add_argument("--format", choices=("json", "tree"), default="json")
-    command.add_argument("--out", help="write UTF-8 output to a file")
-    command.add_argument("--table", help="DFA JSON from HW1; default resolved from module location")
+    command.add_argument("--out", help="записать результат в файл UTF-8")
+    command.add_argument("--table", help="таблица ДКА HW1 в JSON; штатный путь определяется по модулю")
     command.set_defaults(func=cmd_parse)
-    command = sub.add_parser("test", help="run positive/negative AST fixtures")
+    command = sub.add_parser("test", help="проверить положительные и отрицательные эталоны AST")
     command.add_argument("--cases", default=str(DEFAULT_CASES))
     command.add_argument("--table")
     command.add_argument("-v", "--verbose", action="store_true")
     command.set_defaults(func=cmd_test)
     args = parser.parse_args()
     if args.command == "parse" and args.file is None and args.text is None:
-        parser.error("parse: give a file or --text")
+        parser.error("parse: укажите файл или --text")
     if args.command == "parse" and args.file is not None and args.text is not None:
-        parser.error("parse: choose a file or --text")
+        parser.error("parse: выберите файл либо --text")
     try:
         return args.func(args)
     except RecursionError:

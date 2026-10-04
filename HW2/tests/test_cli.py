@@ -1,4 +1,4 @@
-"""CLI contract: exit codes, output files and checked-in reference fixtures."""
+"""Контракт CLI: коды завершения, выходные файлы и эталонные примеры из репозитория."""
 
 import json
 from pathlib import Path

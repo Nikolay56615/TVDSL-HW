@@ -1,7 +1,7 @@
 {
   "cases": [
     {
-      "name": "handwritten_arithmetic_snapshot",
+      "name": "Вручную составленный эталон арифметического AST",
       "input": "main() returns r:int {\n  r = 1 + 2 * 3;\n}\n",
       "valid": true,
       "ast": {
@@ -47,29 +47,29 @@
         ]
       }
     },
-    {"name": "keyword_function", "input": "function f(x:int) returns r:int { r = -x; }", "valid": true},
-    {"name": "contracts", "input": "f(x:int) requires x >= 0 returns r:int ensures r > x { r = x + 1; }", "valid": true},
-    {"name": "array_copy_update", "input": "f(a:int[]) returns b:int[] { b = a; b[0] = b[1] + 1; }", "valid": true},
-    {"name": "nested_array_update", "input": "f(a:int[]) returns b:int[] { b[0][1] = 7; }", "valid": true},
-    {"name": "tuple", "input": "f() returns a:int,b:int { a,b = pair(1); }", "valid": true},
-    {"name": "dangling_else", "input": "f() returns r:int { if (true) if (false) r = 1; else r = 2; }", "valid": true},
-    {"name": "loop_invariant", "input": "f(n:int) returns r:int uses i { i=0; while(i<n) invariant i>=0 { i=i+1; } r=i; }", "valid": true},
-    {"name": "formula_quantifiers", "input": "p(a:int[]) => forall (i:int | exists (j:int | a[i] == j)); f(a:int[]) requires p(a) returns r:int { r=0; }", "valid": true},
-    {"name": "logical_precedence", "input": "f() returns r:int { assert not false and true or false -> true -> false; }", "valid": true},
-    {"name": "unicode_arrow", "input": "f() returns r:int { assert true → false → true; }", "valid": true},
-    {"name": "unicode_comment", "input": "// Комментарий → 😀\nmain() returns r:int { r=1; }", "valid": true},
-    {"name": "syntax_only_unknown_name", "input": "f() returns r:int { r=unknown; }", "valid": true},
-    {"name": "empty", "input": "", "valid": false, "diagnostics": [{"phase": "syntax", "line": 1, "col": 1}]},
-    {"name": "missing_semicolon", "input": "main() returns r:int { r=1 }", "valid": false},
-    {"name": "missing_parenthesis", "input": "f() returns r:int { if (true { r=1; } }", "valid": false},
-    {"name": "unexpected_operator", "input": "f() returns r:int { r=1 ** 2; }", "valid": false},
-    {"name": "extra_token", "input": "f() returns r:int { r=1; else r=2; }", "valid": false},
-    {"name": "numeric_condition", "input": "f() returns r:int { if (1) {} }", "valid": false},
-    {"name": "boolean_arithmetic", "input": "f() returns r:int { r=true+1; }", "valid": false},
-    {"name": "tuple_without_call", "input": "f() returns r:int { a,b=1; }", "valid": false},
-    {"name": "bad_quantifier", "input": "f() returns r:int { assert forall (i:int true); }", "valid": false},
-    {"name": "unicode_code", "input": "f() returns r:int { r=я; }", "valid": false},
-    {"name": "leading_zero", "input": "f() returns r:int { r=007; }", "valid": false},
-    {"name": "recovery_next_function", "input": "bad() returns r:int { r=; } good() returns r:int { r=2; }", "valid": false}
+    {"name": "Ключевое слово function", "input": "function f(x:int) returns r:int { r = -x; }", "valid": true},
+    {"name": "Контракты функции", "input": "f(x:int) requires x >= 0 returns r:int ensures r > x { r = x + 1; }", "valid": true},
+    {"name": "Копирование и обновление массива", "input": "f(a:int[]) returns b:int[] { b = a; b[0] = b[1] + 1; }", "valid": true},
+    {"name": "Вложенное обновление массива", "input": "f(a:int[]) returns b:int[] { b[0][1] = 7; }", "valid": true},
+    {"name": "Множественное присваивание", "input": "f() returns a:int,b:int { a,b = pair(1); }", "valid": true},
+    {"name": "Привязка else к ближайшему if", "input": "f() returns r:int { if (true) if (false) r = 1; else r = 2; }", "valid": true},
+    {"name": "Инвариант цикла", "input": "f(n:int) returns r:int uses i { i=0; while(i<n) invariant i>=0 { i=i+1; } r=i; }", "valid": true},
+    {"name": "Кванторы в формуле", "input": "p(a:int[]) => forall (i:int | exists (j:int | a[i] == j)); f(a:int[]) requires p(a) returns r:int { r=0; }", "valid": true},
+    {"name": "Приоритет логических операций", "input": "f() returns r:int { assert not false and true or false -> true -> false; }", "valid": true},
+    {"name": "Стрелка Unicode", "input": "f() returns r:int { assert true → false → true; }", "valid": true},
+    {"name": "Комментарий с Unicode", "input": "// Комментарий → 😀\nmain() returns r:int { r=1; }", "valid": true},
+    {"name": "Неизвестное имя при проверке только синтаксиса", "input": "f() returns r:int { r=unknown; }", "valid": true},
+    {"name": "Пустой ввод", "input": "", "valid": false, "diagnostics": [{"phase": "syntax", "line": 1, "col": 1}]},
+    {"name": "Пропущена точка с запятой", "input": "main() returns r:int { r=1 }", "valid": false},
+    {"name": "Пропущена скобка", "input": "f() returns r:int { if (true { r=1; } }", "valid": false},
+    {"name": "Неожиданный оператор", "input": "f() returns r:int { r=1 ** 2; }", "valid": false},
+    {"name": "Лишний токен", "input": "f() returns r:int { r=1; else r=2; }", "valid": false},
+    {"name": "Число в условии", "input": "f() returns r:int { if (1) {} }", "valid": false},
+    {"name": "Логическое значение в арифметике", "input": "f() returns r:int { r=true+1; }", "valid": false},
+    {"name": "Множественное присваивание без вызова", "input": "f() returns r:int { a,b=1; }", "valid": false},
+    {"name": "Некорректный квантор", "input": "f() returns r:int { assert forall (i:int true); }", "valid": false},
+    {"name": "Unicode в коде", "input": "f() returns r:int { r=я; }", "valid": false},
+    {"name": "Ведущий ноль", "input": "f() returns r:int { r=007; }", "valid": false},
+    {"name": "Восстановление перед следующей функцией", "input": "bad() returns r:int { r=; } good() returns r:int { r=2; }", "valid": false}
   ]
 }

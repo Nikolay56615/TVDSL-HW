@@ -7,7 +7,7 @@
 
 from dataclasses import dataclass
 
-from funnylex.scanner import Token
+from HW1.funnylex.scanner import Token
 
 
 @dataclass

@@ -1,9 +1,9 @@
-(* Final Funny grammar for HW2. IDENT/INT and keywords come from HW1.
-   EBNF: [...] optional; {...} repetition; | alternatives.
-   Comments/whitespace are skipped; a module must contain a declaration.
-   The expression grammar is factored to share arithmetic/predicate parentheses.
-   Category constraints below are checked after construction of an expression.
-   No backtracking or speculative reparsing is used.
+(* IDENT/INT и ключевые слова берутся из HW1.
+   EBNF: [...] — необязательная часть; {...} — повторение; | — альтернативы.
+   Комментарии и пробельные символы пропускаются; модуль должен содержать объявление.
+   Грамматика выражений приведена к общей форме для скобок в арифметике и предикатах.
+   Приведённые ниже ограничения на категории проверяются после построения выражения.
+   Возврат к предыдущим вариантам разбора и пробный повторный разбор не используются.
 *)
 
 module          = declaration { declaration } EOF ;
@@ -12,9 +12,9 @@ declarationTail = "=>" predicate [ ";" ]
                 | [ "requires" predicate ] "returns" results
                   [ "requires" predicate ] [ "ensures" predicate ]
                   [ "uses" locals ] statement ;
-(* "function" is only allowed on functions; requires appears at most once.
-   The preferred order is requires before returns, as in funny.ru.md.
-   requires after returns is accepted for compatible teaching examples.
+(* "function" допустимо только перед функциями; requires встречается не более одного раза.
+   Предпочтительный порядок — requires перед returns, как в funny.ru.md.
+   requires после returns допускается для совместимости с учебными примерами.
 *)
 
 parameters      = variableDef { "," variableDef } ;
@@ -32,9 +32,9 @@ assignmentTail  = { "[" arithmetic "]" } "=" arithmetic ";"
                 | "," IDENT { "," IDENT } "=" arithmetic ";" ;
 conditional     = "if" "(" condition ")" statement [ "else" statement ] ;
 loop            = "while" "(" condition ")" [ "invariant" predicate ] statement ;
-(* An else binds to the nearest unfinished if. The optional else introduces
-   a FIRST/FOLLOW conflict; the parser resolves it by immediately consuming else.
-   The complete statement grammar is therefore not claimed to be strict LL(1).
+(* else относится к ближайшему if без ветки else. Необязательная ветка else создаёт
+   конфликт FIRST/FOLLOW; парсер разрешает его, сразу принимая встретившийся else.
+   Поэтому полная грамматика операторов не считается строго LL(1).
 *)
 
 arithmetic      = expression ;
@@ -57,23 +57,23 @@ lengthCall      = "length" "(" [ arguments ] ")" ;
 arguments       = arithmetic { "," arithmetic } ;
 quantifier      = ("forall" | "exists") "(" variableDef "|" predicate ")" ;
 
-(* Category constraints, before name/type analysis (HW3):
-   - Arithmetic: INT, Name, Call, Index, unary -, binary + - * / only.
-   - Boolean: Bool, comparison of arithmetic expressions, not/and/or/->,
-     formula Call, and (in predicates only) forall/exists.
-   - Plain arithmetic is not a condition/predicate. length is arithmetic only.
-   - Calls in executable conditions are rejected: formula references are predicates.
-   - Arguments and indexes are arithmetic; comparisons cannot be chained.
-   - Tuple assignment has only Name targets and a Call right-hand side;
-     parentheses around the Call are permitted, e.g. x,y=(f()).
-   - Index chains on Name targets are accepted for nested update sugar.
-   - Optional contracts are absent clauses, not empty expressions after keywords.
-   - requires defaults to true; ensures to false; invariant to true.
-   - Array assignment is lowered to functional ArrayUpdate inside Assign.
-   - + - * / and/or associate left; -> associates right; comparison non-associative.
-   - Highest to lowest: unary -, * /, + -, comparison, not, and, or, ->.
-   - Only int/int[] declared types; no var statement or Boolean variables.
-   - Identifier underscores follow HW1. Identifiers use ASCII.
-     Implication accepts both -> and →, with normalized AST operator ->.
-     Other Unicode is permitted inside skipped comments only.
+(* Ограничения на категории до анализа имён и типов (HW3):
+   - Арифметика: только INT, Name, Call, Index, унарный -, бинарные + - * /.
+   - Логические выражения: Bool, сравнение арифметических выражений, not/and/or/->,
+     вызов формулы Call и (только в предикатах) forall/exists.
+   - Обычная арифметика не является условием или предикатом. length допустимо только в арифметике.
+   - Вызовы в исполняемых условиях запрещены: ссылки на формулы относятся к предикатам.
+   - Аргументы и индексы — арифметические выражения; цепочки сравнений запрещены.
+   - У множественного присваивания слева только узлы Name, справа — Call;
+     скобки вокруг Call допускаются, например x,y=(f()).
+   - Цепочки индексов после Name допускаются как синтаксический сахар для вложенных обновлений.
+   - Необязательный контракт означает отсутствие раздела, а не пустое выражение после ключевого слова.
+   - По умолчанию requires равно true, ensures — false, invariant — true.
+   - Присваивание элементу массива преобразуется в функциональный ArrayUpdate внутри Assign.
+   - + - * / and/or левоассоциативны; -> правоассоциативна; сравнения неассоциативны.
+   - Приоритет от высшего к низшему: унарный -, * /, + -, сравнение, not, and, or, ->.
+   - Объявляются только типы int/int[]; оператора var и логических переменных нет.
+   - Подчёркивания в идентификаторах соответствуют правилам HW1. Идентификаторы используют ASCII.
+     Импликация допускает -> и →; в AST оператор нормализуется к ->.
+     Остальные символы Unicode допустимы только в пропускаемых комментариях.
 *)

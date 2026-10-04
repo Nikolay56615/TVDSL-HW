@@ -2,13 +2,13 @@
 
 from pathlib import Path
 
-from funnylex.alphabet import OTHER
-from funnylex.scanner import Table, Token, tokenize
+from HW1.funnylex.alphabet import OTHER
+from HW1.funnylex.scanner import Table, Token, tokenize
 
 from .parser import Diagnostic
 
 
-DEFAULT_TABLE = Path(__file__).resolve().parents[2] / "generated" / "dfa.min.json"
+DEFAULT_TABLE = Path(__file__).resolve().parents[2] / "HW1" / "generated" / "dfa.min.json"
 
 
 class FunnyTable(Table):

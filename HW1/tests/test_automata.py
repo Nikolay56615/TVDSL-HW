@@ -1,17 +1,17 @@
-"""Модульные тесты алгоритмов. Запуск из корня:  python -m unittest discover -s tests"""
+"""Модульные тесты алгоритмов. Из корня: python -m unittest discover -s HW1/tests"""
 
 import itertools
 import random
 import re
 import unittest
 
-from funnylex import export, regex
-from funnylex.alphabet import SIZE
-from funnylex.dfa import DFA, subset_construction
-from funnylex.minimize import hopcroft, minimize
-from funnylex.nfa import build_nfa, simulate
-from funnylex.scanner import Table, tokenize
-from funnylex.spec import parse_spec
+from HW1.funnylex import export, regex
+from HW1.funnylex.alphabet import SIZE
+from HW1.funnylex.dfa import DFA, subset_construction
+from HW1.funnylex.minimize import hopcroft, minimize
+from HW1.funnylex.nfa import build_nfa, simulate
+from HW1.funnylex.scanner import Table, tokenize
+from HW1.funnylex.spec import parse_spec
 
 # Выражения записаны так, чтобы их понимал и модуль re - он служит независимым эталоном.
 PATTERNS = ["a|b", "(ab)*", "(a|b)*abb", "a(b|c)d", "abd|acd", "0|[1-9][0-9]*",

@@ -1,4 +1,4 @@
-"""Командная строка:  python -m funnylex <команда>
+"""Командная строка из корня репозитория: python -m HW1.funnylex <команда>
 
     build   tokens.spec -> generated/   (НКА -> ДКА -> минимальный ДКА, таблицы)
     test    прогнать tests/cases.json через таблицу и напечатать PASS/FAIL
@@ -16,6 +16,9 @@ from .minimize import minimize
 from .nfa import build_nfa
 from .scanner import Table, classify, tokenize
 from .spec import load_spec
+
+
+HW1_ROOT = Path(__file__).resolve().parents[1]
 
 
 def build_automata(rules):
@@ -37,8 +40,10 @@ def cmd_build(args):
         raise ValueError("правило %s принимает пустую строку" % rules[dfa.accept[dfa.start]].name)
     out = Path(args.out)
     out.mkdir(exist_ok=True)
-    write(out / "dfa.json", export.to_json(export.to_dict(dfa, rules, args.spec)))
-    write(out / "dfa.min.json", export.to_json(export.to_dict(mini, rules, args.spec)))
+    # Для штатного tokens.spec метаданные остаются переносимыми между машинами.
+    source = "tokens.spec" if Path(args.spec).resolve() == HW1_ROOT / "tokens.spec" else args.spec
+    write(out / "dfa.json", export.to_json(export.to_dict(dfa, rules, source)))
+    write(out / "dfa.min.json", export.to_json(export.to_dict(mini, rules, source)))
     write(out / "dfa.min.csv", export.to_csv(mini, rules))
     write(out / "dfa.min.dot", export.to_dot(mini, rules))
     print("rules:          %d" % len(rules))
@@ -98,20 +103,20 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
 
     p = sub.add_parser("build", help="build automata and tables from tokens.spec")
-    p.add_argument("--spec", default="tokens.spec")
-    p.add_argument("--out", default="generated")
+    p.add_argument("--spec", default=str(HW1_ROOT / "tokens.spec"))
+    p.add_argument("--out", default=str(HW1_ROOT / "generated"))
     p.set_defaults(func=cmd_build)
 
     p = sub.add_parser("test", help="run tests/cases.json through the table")
-    p.add_argument("--table", default="generated/dfa.min.json")
-    p.add_argument("--cases", default="tests/cases.json")
+    p.add_argument("--table", default=str(HW1_ROOT / "generated" / "dfa.min.json"))
+    p.add_argument("--cases", default=str(HW1_ROOT / "tests" / "cases.json"))
     p.add_argument("-v", "--verbose", action="store_true", help="print PASS lines too")
     p.set_defaults(func=cmd_test)
 
     p = sub.add_parser("lex", help="tokenize a file or --text")
     p.add_argument("file", nargs="?")
     p.add_argument("--text")
-    p.add_argument("--table", default="generated/dfa.min.json")
+    p.add_argument("--table", default=str(HW1_ROOT / "generated" / "dfa.min.json"))
     p.add_argument("--keep-skipped", action="store_true", help="also print WS and COMMENT")
     p.set_defaults(func=cmd_lex)
 
