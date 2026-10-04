@@ -1,8 +1,10 @@
-"""Рекурсивный спуск Funny: AST, приоритеты и восстановление после ошибок.
+"""Рекурсивный спуск: поток Token -> дерево программы Funny.
 
-Скобки арифметики и предикатов имеют общий префикс. Поэтому выражение
-разбирается один раз общей факторизованной грамматикой, затем проверяется
-его синтаксическая категория. Проверки имён, типов и арности относятся к HW3.
+Узлы дерева - словари: kind - вид узла, pos - строка и столбец токена,
+остальные поля зависят от kind. У Binary это op, left и right.
+
+По открывающей '(' ещё нельзя отличить (a + b) от (a < b). Поэтому скобки
+разбираем одинаково, а затем проверяем, какое выражение получилось.
 """
 
 from dataclasses import dataclass
@@ -37,7 +39,7 @@ class ParseResult:
 
 
 class _ParseError(Exception):
-    """Уже записанная ошибка; вызывающий нетерминал выбирает синхронизацию."""
+    """Прерывает разбор; сообщение уже добавлено в diagnostics."""
 
 
 _COMPARISONS = {"==", "!=", "<", "<=", ">", ">="}
@@ -50,7 +52,7 @@ def _node(kind, token, **fields):
 
 
 def _category(expression):
-    """Категория по форме AST, без таблицы символов и вывода типов."""
+    """Вид выражения по дереву: arithmetic, boolean или call."""
     kind = expression["kind"]
     if kind in {"Bool", "Quantifier"}:
         return "boolean"
@@ -59,14 +61,18 @@ def _category(expression):
     if kind == "Unary":
         return "arithmetic" if expression["op"] == "-" else "boolean"
     if kind == "Call":
+        # length(a) - арифметика. f(x) пока может быть и функцией, и формулой:
+        # по одному вызову неизвестно, как объявлено f.
         return "arithmetic" if expression["name"] == "length" else "call"
     return "arithmetic"
 
 
 class _Parser:
+    """tokens - поток с EOF в конце; index - номер текущего токена."""
+
     def __init__(self, tokens):
         raw = list(tokens)
-        # ERROR диагностирует адаптер лексера; здесь не дублируем сообщение.
+        # Ошибки лексера уже записаны в lexer.py; пробелы и ошибки пропускаем.
         self.tokens = [token for token in raw
                        if token.category not in {"skip", "error"}
                        and token.kind != "ERROR"]
@@ -91,7 +97,7 @@ class _Parser:
     def _text(self, offset=0):
         token = self.tokens[min(self.index + offset, len(self.tokens) - 1)]
         if token.kind == "EOF":
-            return "<EOF>"  # Не совпадает с допустимым IDENT("EOF").
+            return "<EOF>"  # Не спутать конец файла с переменной по имени EOF.
         return "->" if token.kind == "ARROW" else token.lexeme
 
     def _advance(self):
@@ -126,16 +132,16 @@ class _Parser:
         return self._advance()
 
     def _declaration_start(self):
-        """Граница объявления, в том числе при потерянной '}' перед ним.
+        """Начинается ли здесь следующее объявление? Токены не забираем.
 
-        Это просмотр заголовка для panic mode, а не повторный разбор выражений.
-        Идентификатор вызова сам по себе не считается новым объявлением.
+        После f(...) ищем returns, requires или =>: вызов f(...); сюда не подходит.
+        Так можно сохранить следующее объявление, даже если перед ним забыли '}'.
         """
         if self._text() == "function":
             return True
         if self.token.kind != "IDENT" or self._text(1) != "(":
             return False
-        depth = 0
+        depth = 0                       # число незакрытых скобок в заголовке
         for position in range(self.index + 1, len(self.tokens)):
             text = self.tokens[position].lexeme
             if text == "(":
@@ -153,18 +159,23 @@ class _Parser:
         return self._text() in _STATEMENT_WORDS or self.token.kind == "IDENT"
 
     def _sync_declaration(self, start):
+        """Пропустить ошибочное объявление до следующего заголовка."""
+        # Если ошибка на первом токене, сдвигаемся сами, иначе разберём его снова.
         if self.index == start and self._text() != "<EOF>":
             self._advance()
         while self._text() != "<EOF>" and not self._declaration_start():
             self._advance()
 
     def _sync_statement(self, start):
+        """Пропустить остаток оператора; start - где начался его разбор."""
         while self._text() != "<EOF>":
             if self._text() == ";":
                 self._advance()
                 return
             if self._text() in {"}", "else"} or self._declaration_start():
                 return
+            # Новое присваивание или if сохраняем, но только после сдвига:
+            # тот же ошибочный токен иначе будет разбираться бесконечно.
             if self.index > start and self._statement_start():
                 return
             self._advance()
@@ -219,7 +230,7 @@ class _Parser:
             if keyword is not None:
                 self._fail("После 'function' ожидалось объявление функции, а не формулы", keyword)
             predicate = self._predicate()
-            # В EBNF формула без ';', в примерах курса — с ней. Принимаем оба.
+            # В грамматике после формулы нет ';', но в примерах она встречается.
             self._match(";")
             return _node("Formula", position, name=name.lexeme, params=params,
                          predicate=predicate)
@@ -230,7 +241,7 @@ class _Parser:
             requires = self._predicate()
         self._expect("returns")
         returns = self._variables()
-        # Вариант из учебных примеров: requires после returns.
+        # В примерах курса requires бывает и после returns.
         late_requires = self._match("requires")
         if late_requires:
             if has_requires:
@@ -276,8 +287,8 @@ class _Parser:
                 return _node("Block", brace, statements=statements)
             start = self.index
             statements.append(self._recovered_statement())
-            # На 'else' восстановление сохраняет токен для ближайшего if.
-            # Если он попал в обычный блок, потребляем его, чтобы не зациклиться.
+            # _sync_statement оставляет else для if. Если здесь нет такого if,
+            # забираем else сами, иначе цикл снова наткнётся на него же.
             if self.index == start and self._text() not in {"}", "<EOF>"}:
                 self._advance()
         if self._text() == "<EOF>":
@@ -292,7 +303,7 @@ class _Parser:
         condition = self._condition()
         self._expect(")")
         then = self._recovered_statement()
-        # Рекурсивный вызов уже забрал else внутреннего if: nearest-if rule.
+        # В if (a > 0) if (b > 0) x=1; else x=2; else забирает внутренний _if.
         otherwise = self._recovered_statement() if self._match("else") else None
         return _node("If", keyword, condition=condition, then=then, **{"else": otherwise})
 
@@ -328,7 +339,9 @@ class _Parser:
             self._diagnose("Присваивание кортежа требует вызова функции справа", name)
         self._expect(";")
         if indexes:
-            # a[i][j]=v -> a=set(a,i,set(a[i],j,v)); копирование явно видно в AST.
+            # a[i][j] = v -> a = set(a, i, set(a[i], j, v)).
+            # bases - массив перед каждым индексом: [a, a[i]] для примера выше.
+            # Эти же узлы ставим в ArrayUpdate: сначала обновляем a[i], затем a.
             bases, base = [], target
             for bracket, index in indexes:
                 bases.append(base)
@@ -345,6 +358,8 @@ class _Parser:
 
     def _require_boolean(self, expression, predicate):
         category = _category(expression)
+        # В предикате f(x) может быть ссылкой на формулу. В if/while нужен
+        # boolean: сравнение, логическая операция или true/false.
         if category == "boolean" or (predicate and category == "call"):
             return
         pos = expression["pos"]
@@ -369,7 +384,13 @@ class _Parser:
         return value
 
     def _expression(self, predicate):
-        # Импликация правоассоциативна; все остальные бинарные операции — слева.
+        """Уровни от слабой операции к сильной:
+        импликация, or, and, not, сравнение, + и -, * и /, унарный -.
+        Скобки начинают разбор заново с импликации.
+
+        predicate=True разрешает ссылки на формулы и кванторы.
+        """
+        # Справа вызываем тот же уровень: p -> q -> r = p -> (q -> r).
         left = self._or(predicate)
         operator = self._match("->")
         if operator:
@@ -420,12 +441,14 @@ class _Parser:
         return left
 
     def _add(self, predicate):
+        # Слагаемое разбирается целиком: 1 + 2 * 3 = 1 + (2 * 3).
         left = self._multiply(predicate)
         while self._text() in {"+", "-"}:
             operator = self._advance()
             right = self._multiply(predicate)
             self._require_arithmetic(left)
             self._require_arithmetic(right)
+            # Новое дерево оборачивает left: 10 - 3 - 2 = (10 - 3) - 2.
             left = _node("Binary", operator, op=operator.lexeme, left=left, right=right)
         return left
 
@@ -500,10 +523,9 @@ class _Parser:
 
 
 def parse_tokens(tokens):
-    """Разобрать поток Token, вернуть AST и только синтаксическую диагностику.
+    """Поток Token -> ParseResult (дерево и список синтаксических ошибок).
 
-    EOF можно передать явно; иначе он добавляется в конец. Пропущенные токены
-    и лексические ошибки игнорируются: их сообщения должен сохранить вызывающий
-    адаптер. После ошибки возвращается частичный AST с узлами Error.
+    EOF добавляется, если его нет в потоке. После ошибки разбираем дальше;
+    вместо неразобранного оператора в дереве остаётся узел Error.
     """
     return _Parser(tokens).parse()

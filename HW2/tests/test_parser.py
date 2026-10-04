@@ -1,4 +1,4 @@
-"""Независимые проверки синтаксиса и AST: python -m unittest discover -s HW2/tests."""
+"""Тесты парсера и AST. Из корня: python -m unittest discover -s HW2/tests"""
 
 import json
 from pathlib import Path
@@ -14,7 +14,7 @@ HERE = Path(__file__).resolve().parent
 
 
 def shape(value):
-    """Координаты не учитываются только в проверках структуры; эталоны проверяют их полностью."""
+    """Дерево без pos: в этих тестах сравниваем структуру. Позиции проверяем отдельно."""
     if isinstance(value, dict):
         return {key: shape(item) for key, item in value.items() if key != "pos"}
     if isinstance(value, list):
@@ -135,7 +135,6 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(predicate["right"]["right"]["pos"], {"line": 3, "col": 21})
 
     def test_course_sorted_formula_with_unicode_arrow(self):
-        # Этот пример в репозитории сохраняет исходную программу Funny из step12.
         source = (ROOT / "HW2" / "examples" / "good_formulas.funny").read_text(encoding="utf-8")
         self.assertIn("→", source)
         declarations = self.valid(source)["declarations"]
@@ -321,7 +320,7 @@ class ParserTests(unittest.TestCase):
         self.invalid("f() returns r:int { if (someFormula(1)) {} }")
 
     def test_semantic_checks_are_deferred(self):
-        # Поиск имён, изменяемость, число аргументов и вывод типов относятся к HW3.
+        # Здесь синтаксис верный. Неизвестные имена, типы и число аргументов проверит HW3.
         for source in (
             "f() returns r:int { r = unknown + 1; }",
             "f() returns r:int { r = missing(1, 2); }",
@@ -348,7 +347,7 @@ class ParserTests(unittest.TestCase):
         self.assertIn("good", [function.get("name") for function in result.ast["declarations"]])
 
     def test_negative_inputs_terminate_in_separate_process(self):
-        # Тайм-аут выявляет зацикливание при восстановлении после ошибки, не давая unittest зависнуть.
+        # Если восстановление зациклится, через 15 секунд упадёт тест, а не зависнет весь запуск.
         inputs = ["", "}", "; ; ;", "f(", "f() returns r:int {", "f() returns r:int { r = (((1; }",
                   "f() returns r:int { if (true { r = 1; } }", "f() returns r:int { r = 1 ** 2; }",
                   "f() returns r:int { r = 1; else r = 2; }", "f() returns r:int { assert exists (i:int true); }"]

@@ -1,4 +1,4 @@
-"""Адаптер табличного лексера HW1 для парсера: позиции, EOF, диагностика."""
+"""Табличный лексер Funny: токены с позициями, ошибки и конец ввода."""
 
 from pathlib import Path
 
@@ -12,7 +12,7 @@ DEFAULT_TABLE = Path(__file__).resolve().parents[2] / "HW1" / "generated" / "dfa
 
 
 class FunnyTable(Table):
-    """Таблица HW1 с односимвольным Unicode-оператором импликации Funny."""
+    """ДКА HW1; символ → распознаётся теми же состояниями, что и два символа ->."""
 
     def __init__(self, data):
         super().__init__(data)
@@ -21,21 +21,14 @@ class FunnyTable(Table):
 
     def step(self, state, ch):
         if ch == "→" and self.accept[state] not in self.comment_rules:
-            # Один символ исходника проходит два перехода ДКА для ASCII '->'.
-            # Лексема остаётся '→', поэтому столбцы следующих токенов не сдвигаются.
+            # Проходим '-' и '>' за один прочитанный символ. Заменять текст нельзя:
+            # в true→false слово false начинается в столбце 6, а в true->false — в 7.
             return super().step(super().step(state, "-"), ">")
         return super().step(state, ch)
 
 
 def load_table(path=None):
-    """Загрузить ДКА HW1; поддержать → и Unicode внутри комментариев.
-
-    В HW1 весь алфавит строго ASCII. В примерах курса комментарии на русском,
-    поэтому в принимающих состояниях COMMENT символ OTHER ведёт туда же,
-    куда обычная буква. Unicode-стрелка — отдельный оператор Funny;
-    идентификаторы и прочие символы кода сохраняют алфавит HW1.
-    Файл автомата и исходный сканер при этом не изменяются.
-    """
+    """Загрузить ДКА. В COMMENT символ OTHER читается как обычная буква."""
     table = FunnyTable.load(DEFAULT_TABLE if path is None else path)
     for state, rule in enumerate(table.accept):
         if rule in table.comment_rules:
@@ -44,8 +37,8 @@ def load_table(path=None):
 
 
 def lex(text, table_path=None):
-    """Вернуть токены с EOF и лексические ошибки. Строки/столбцы с единицы."""
-    # Одинаковые позиции для LF, CRLF и старого Mac CR, включая строку EOF.
+    """Текст -> (токены с EOF, ошибки). Строки и столбцы считаются с 1."""
+    # В сканере HW1 новую строку начинает только LF; CRLF и CR приводим к нему.
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     tokens = tokenize(load_table(table_path), text)
     diagnostics = []
@@ -58,5 +51,6 @@ def lex(text, table_path=None):
             message = "Недопустимые символы: %r" % token.lexeme
         diagnostics.append(Diagnostic("lexical", token.line, token.col, message))
     lines = text.split("\n")
+    # EOF стоит после последнего символа, в том числе на пустой строке после LF.
     tokens.append(Token("EOF", "", len(lines), len(lines[-1]) + 1, "token"))
     return tokens, diagnostics

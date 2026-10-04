@@ -1,7 +1,7 @@
 {
   "cases": [
     {
-      "name": "Вручную составленный эталон арифметического AST",
+      "name": "Приоритет: 1 + 2 * 3",
       "input": "main() returns r:int {\n  r = 1 + 2 * 3;\n}\n",
       "valid": true,
       "ast": {
@@ -58,7 +58,7 @@
     {"name": "Приоритет логических операций", "input": "f() returns r:int { assert not false and true or false -> true -> false; }", "valid": true},
     {"name": "Стрелка Unicode", "input": "f() returns r:int { assert true → false → true; }", "valid": true},
     {"name": "Комментарий с Unicode", "input": "// Комментарий → 😀\nmain() returns r:int { r=1; }", "valid": true},
-    {"name": "Неизвестное имя при проверке только синтаксиса", "input": "f() returns r:int { r=unknown; }", "valid": true},
+    {"name": "Синтаксис допускает неизвестное имя", "input": "f() returns r:int { r=unknown; }", "valid": true},
     {"name": "Пустой ввод", "input": "", "valid": false, "diagnostics": [{"phase": "syntax", "line": 1, "col": 1}]},
     {"name": "Пропущена точка с запятой", "input": "main() returns r:int { r=1 }", "valid": false},
     {"name": "Пропущена скобка", "input": "f() returns r:int { if (true { r=1; } }", "valid": false},
@@ -68,7 +68,7 @@
     {"name": "Логическое значение в арифметике", "input": "f() returns r:int { r=true+1; }", "valid": false},
     {"name": "Множественное присваивание без вызова", "input": "f() returns r:int { a,b=1; }", "valid": false},
     {"name": "Некорректный квантор", "input": "f() returns r:int { assert forall (i:int true); }", "valid": false},
-    {"name": "Unicode в коде", "input": "f() returns r:int { r=я; }", "valid": false},
+    {"name": "Кириллица вместо идентификатора", "input": "f() returns r:int { r=я; }", "valid": false},
     {"name": "Ведущий ноль", "input": "f() returns r:int { r=007; }", "valid": false},
     {"name": "Восстановление перед следующей функцией", "input": "bad() returns r:int { r=; } good() returns r:int { r=2; }", "valid": false}
   ]

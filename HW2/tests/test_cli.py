@@ -1,4 +1,4 @@
-"""Контракт CLI: коды завершения, выходные файлы и эталонные примеры из репозитория."""
+"""Тесты команд parse и test: вывод, файлы и коды завершения."""
 
 import json
 from pathlib import Path
@@ -113,6 +113,62 @@ class CommandLineTests(unittest.TestCase):
         completed = self.command("test")
         self.assertEqual(completed.returncode, 0, completed.stderr + completed.stdout)
         self.assertIn("25 cases: 25 passed, 0 failed", completed.stdout)
+
+    def test_verbose_fixture_command_shows_programs_and_diagnostics(self):
+        completed = self.command("test", "-v")
+        self.assertEqual(completed.returncode, 0, completed.stderr + completed.stdout)
+        output = completed.stdout
+        self.assertEqual(len([line for line in output.splitlines() if line.startswith("[")]), 25)
+        arithmetic = output.split("[02/25]", 1)[0]
+        self.assertIn("[01/25] PASS", arithmetic)
+        self.assertIn("  r = 1 + 2 * 3;", arithmetic)
+        self.assertIn("Ожидалось: корректная программа", arithmetic)
+        self.assertIn("Получено: корректная программа, ошибок нет", arithmetic)
+        self.assertIn("AST: совпадает с эталоном", arithmetic)
+        empty = output.split("[14/25]", 1)[1].split("[15/25]", 1)[0]
+        self.assertIn("Пустой ввод", empty)
+        self.assertIn("Программа: <пустой ввод>", empty)
+        self.assertIn("Ожидалось: некорректная программа", empty)
+        self.assertIn("syntax 1:1: Модуль пуст", empty)
+        self.assertIn("Диагностика: совпадает с эталоном", empty)
+        leading_zero = output.split("[24/25]", 1)[1].split("[25/25]", 1)[0]
+        self.assertIn("r=007;", leading_zero)
+        self.assertIn("lexical 1:23: Целое число с ведущим нулём: 007", leading_zero)
+        self.assertIn("25 cases: 25 passed, 0 failed", output)
+        self.assertNotIn('"declarations":', output)
+        self.assertNotIn("\x1b", output)
+
+    def test_verbose_wrong_validity_shows_expected_and_actual(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = Path(directory) / "cases.json"
+            fixture.write_text(json.dumps({"cases": [{"name": "wrong_expectation", "input": "", "valid": True}]}),
+                               encoding="utf-8")
+            completed = self.command("test", "--cases", fixture, "-v")
+            self.assertEqual(completed.returncode, 1, completed.stderr)
+            self.assertIn("[01/01] FAIL  wrong_expectation", completed.stdout)
+            self.assertIn("Ожидалось: корректная программа", completed.stdout)
+            self.assertIn("Получено: некорректная программа", completed.stdout)
+            self.assertIn("syntax 1:1: Модуль пуст", completed.stdout)
+            self.assertIn("1 cases: 0 passed, 1 failed", completed.stdout)
+
+    def test_verbose_mismatch_identifies_ast_field_and_diagnostics(self):
+        reference = json.loads((ROOT / "HW2" / "tests" / "cases.json").read_text(encoding="utf-8"))["cases"][0]
+        reference["ast"]["declarations"][0]["body"]["statements"][0]["value"]["op"] = "-"
+        cases = [reference, {"name": "wrong_phase", "input": "", "valid": False,
+                             "diagnostics": [{"phase": "lexical", "line": 1, "col": 1}]}]
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = Path(directory) / "cases.json"
+            fixture.write_text(json.dumps({"cases": cases}), encoding="utf-8")
+            completed = self.command("test", "--cases", fixture, "-v")
+            self.assertEqual(completed.returncode, 1, completed.stderr)
+            self.assertIn("[01/02] FAIL", completed.stdout)
+            self.assertIn('ast.declarations[0].body.statements[0].value.op: ожидалось "-", получено "+"',
+                          completed.stdout)
+            self.assertIn("[02/02] FAIL  wrong_phase", completed.stdout)
+            self.assertIn("Диагностика: не совпадает с эталоном", completed.stdout)
+            self.assertIn("'phase': 'lexical'", completed.stdout)
+            self.assertIn("syntax 1:1: Модуль пуст", completed.stdout)
+            self.assertIn("2 cases: 0 passed, 2 failed", completed.stdout)
 
     def test_fixture_mismatch_returns_one(self):
         with tempfile.TemporaryDirectory() as directory:
