@@ -1,5 +1,22 @@
+# Кэш Python и виртуальные окружения
 __pycache__/
-*.pyc
+*.py[cod]
+.venv/
+venv/
+
+# Настройки редакторов
 .idea/
+.vscode/
+
+# Локальные пояснения
+/REPORT.md
+/docs/
+/HW1/REPORT.md
+/HW1/docs/
+/HW2/REPORT.md
+/HW2/docs/
+
+# Результаты запуска
+/ast.json
+/HW2/ast.json
 /HW1/dfa.svg
-ast.json
