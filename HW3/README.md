@@ -29,14 +29,19 @@ python -m HW3.funnytypes check HW3/examples/good_basic.funny
 python -m HW3.funnytypes check HW3/examples/good_basic.funny --format tree
 python -m HW3.funnytypes check HW3/examples/bad_types.funny --format tree
 python -m HW3.funnytypes check --text 'f(x:int) returns r:int uses tmp { tmp = x + 1; r = tmp; }'
-python -m HW3.funnytypes check HW3/examples/good_basic.funny --out typed_ast.json
+python -m HW3.funnytypes check HW3/examples/good_basic.funny --format json --out typed_ast.json
 python -m HW3.funnytypes test
 python -m HW3.funnytypes test -v
 python -m unittest discover -s HW3/tests
 ```
 
-- `check` выводит JSON с полями `ok`, `ast`, `diagnostics`; `--text` задаёт текст вместо файла.
-- `--format tree` показывает дерево с типами и координатами; `--out PATH` сохраняет результат в UTF-8.
+- Обычный `check` выводит `Ошибок нет.` для корректной программы
+  или сообщения об ошибках с координатами. Дерево по умолчанию не выводится.
+  `--text` задаёт текст вместо файла.
+- `--format tree` показывает дерево с типами и координатами, в том числе при ошибках.
+- `--format json` явно выбирает JSON: при успехе поля `ok`, `ast`, `diagnostics`,
+  при ошибках — только `ok` и `diagnostics`, без дерева.
+- `--out PATH` сохраняет выбранный формат в UTF-8.
 - `test` проверяет случаи из `HW3/tests/cases.json`; `test -v` показывает исходники,
   ожидаемый и полученный результат, ошибки и сравнение заданных эталонов.
   Свой набор: `test --cases PATH -v`.

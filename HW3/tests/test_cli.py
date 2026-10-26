@@ -35,6 +35,10 @@ class CommandLineTests(unittest.TestCase):
     def test_positive_file_has_types_and_keeps_declared_annotations(self):
         completed = self.command("check", EXAMPLES / "good_basic.funny")
         self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertEqual(completed.stdout, "Ошибок нет.\n")
+        self.assertEqual(completed.stderr, "")
+        completed = self.command("check", EXAMPLES / "good_basic.funny", "--format", "json")
+        self.assertEqual(completed.returncode, 0, completed.stderr)
         output = json.loads(completed.stdout)
         self.assertTrue(output["ok"])
         self.assertEqual(output["diagnostics"], [])
@@ -45,6 +49,10 @@ class CommandLineTests(unittest.TestCase):
         self.assertEqual(function["locals"][1]["inferred_type"], "int")
         self.assertEqual(function["body"]["statements"][0]["value"]["inferred_type"], "int")
         self.assertEqual(completed.stderr, "")
+        completed = self.command("check", EXAMPLES / "good_basic.funny", "--format", "tree")
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertTrue(completed.stdout.startswith("Module @1:1\n"))
+        self.assertIn('inferred_type: "int"', completed.stdout)
 
     def test_all_examples_have_the_expected_validity(self):
         examples = sorted(EXAMPLES.glob("*.funny"))
@@ -54,10 +62,15 @@ class CommandLineTests(unittest.TestCase):
                 expected = example.name.startswith("good_")
                 completed = self.command("check", example)
                 self.assertEqual(completed.returncode, 0 if expected else 1, completed.stderr)
-                self.assertEqual(json.loads(completed.stdout)["ok"], expected)
+                if expected:
+                    self.assertEqual(completed.stdout, "Ошибок нет.\n")
+                else:
+                    self.assertTrue(completed.stdout.strip())
+                    for line in completed.stdout.splitlines():
+                        self.assertRegex(line, r"^\d+:\d+: semantic \[[a-z_]+\]: ")
 
     def test_semantic_error_has_code_and_token_position(self):
-        completed = self.command("check", "--text", UNKNOWN)
+        completed = self.command("check", "--text", UNKNOWN, "--format", "json")
         self.assertEqual(completed.returncode, 1, completed.stderr)
         diagnostic = json.loads(completed.stdout)["diagnostics"][0]
         self.assertEqual(diagnostic["phase"], "semantic")
@@ -67,7 +80,7 @@ class CommandLineTests(unittest.TestCase):
         self.assertEqual(completed.stderr, "")
 
     def test_independent_errors_are_all_reported(self):
-        completed = self.command("check", EXAMPLES / "bad_types.funny")
+        completed = self.command("check", EXAMPLES / "bad_types.funny", "--format", "json")
         self.assertEqual(completed.returncode, 1, completed.stderr)
         diagnostics = json.loads(completed.stdout)["diagnostics"]
         self.assertEqual([diagnostic["code"] for diagnostic in diagnostics],
@@ -75,7 +88,7 @@ class CommandLineTests(unittest.TestCase):
         self.assertEqual([diagnostic["line"] for diagnostic in diagnostics], [2, 3, 4, 5])
 
     def test_lexical_and_syntax_errors_survive_checking_in_utf8(self):
-        completed = self.command("check", "--text", "f() returns r:int { r=😀; }")
+        completed = self.command("check", "--text", "f() returns r:int { r=😀; }", "--format", "json")
         self.assertEqual(completed.returncode, 1, completed.stderr)
         diagnostics = json.loads(completed.stdout)["diagnostics"]
         lexical = next(diagnostic for diagnostic in diagnostics if diagnostic["phase"] == "lexical")
@@ -84,40 +97,54 @@ class CommandLineTests(unittest.TestCase):
         self.assertTrue(any(diagnostic["phase"] == "syntax" for diagnostic in diagnostics))
         self.assertNotIn("UnicodeEncodeError", completed.stderr)
 
-    def test_tree_format_shows_types_nodes_and_semantic_code(self):
-        completed = self.command("check", "--text", UNKNOWN, "--format", "tree")
-        self.assertEqual(completed.returncode, 1, completed.stderr)
-        self.assertTrue(completed.stdout.startswith("Module @1:1\n"), completed.stdout)
-        self.assertIn("Function @1:1", completed.stdout)
-        self.assertIn("Assign @2:5", completed.stdout)
-        self.assertIn('inferred_type: "error"', completed.stdout)
-        self.assertIn("2:9: semantic [unknown_variable]:", completed.stdout)
+    def test_error_tree_requires_explicit_tree_format(self):
+        for output_format in (None, "json", "tree"):
+            with self.subTest(output_format=output_format):
+                arguments = [] if output_format is None else ["--format", output_format]
+                completed = self.command("check", "--text", UNKNOWN, *arguments)
+                self.assertEqual(completed.returncode, 1, completed.stderr)
+                self.assertEqual(completed.stderr, "")
+                if output_format == "json":
+                    output = json.loads(completed.stdout)
+                    self.assertEqual(set(output), {"ok", "diagnostics"})
+                    self.assertFalse(output["ok"])
+                    self.assertEqual(output["diagnostics"][0]["code"], "unknown_variable")
+                elif output_format == "tree":
+                    self.assertTrue(completed.stdout.startswith("Module @1:1\n"), completed.stdout)
+                    self.assertIn("Function @1:1", completed.stdout)
+                    self.assertIn("Assign @2:5", completed.stdout)
+                    self.assertIn('inferred_type: "error"', completed.stdout)
+                    self.assertIn("2:9: semantic [unknown_variable]:", completed.stdout)
+                else:
+                    self.assertEqual(completed.stdout,
+                                     "2:9: semantic [unknown_variable]: Неизвестная переменная 'missing'\n")
 
     def test_empty_text_is_a_program_error(self):
         completed = self.command("check", "--text", "")
         self.assertEqual(completed.returncode, 1, completed.stderr)
-        self.assertFalse(json.loads(completed.stdout)["ok"])
+        self.assertIn("1:1: syntax:", completed.stdout)
+        self.assertNotIn("Module", completed.stdout)
 
     def test_unicode_arrow_formula_and_array_tuple_types(self):
-        contracts = self.command("check", EXAMPLES / "good_contracts.funny")
+        contracts = self.command("check", EXAMPLES / "good_contracts.funny", "--format", "json")
         self.assertEqual(contracts.returncode, 0, contracts.stderr)
         quantified = json.loads(contracts.stdout)["ast"]["declarations"][0]["predicate"]
         self.assertEqual(quantified["inferred_type"], "bool")
         self.assertEqual(quantified["predicate"]["op"], "->")
-        tuple_call = self.command("check", EXAMPLES / "good_tuple.funny")
+        tuple_call = self.command("check", EXAMPLES / "good_tuple.funny", "--format", "json")
         self.assertEqual(tuple_call.returncode, 0, tuple_call.stderr)
         function = json.loads(tuple_call.stdout)["ast"]["declarations"][1]
         self.assertEqual(function["body"]["statements"][0]["value"]["inferred_type"], ["int", "int[]"])
         self.assertEqual([local["inferred_type"] for local in function["locals"]], ["int", "int[]"])
 
-    def test_out_preserves_error_status_and_utf8_for_both_formats(self):
+    def test_out_preserves_error_status_and_utf8_for_all_formats(self):
         source = "f() returns r:int { r=😀; }"
         with tempfile.TemporaryDirectory() as directory:
-            for output_format in ("json", "tree"):
+            for output_format in (None, "json", "tree"):
                 with self.subTest(output_format=output_format):
-                    destination = Path(directory) / ("результат." + output_format)
-                    completed = self.command("check", "--text", source, "--format", output_format,
-                                             "--out", destination)
+                    destination = Path(directory) / ("результат." + (output_format or "default"))
+                    arguments = [] if output_format is None else ["--format", output_format]
+                    completed = self.command("check", "--text", source, *arguments, "--out", destination)
                     self.assertEqual(completed.returncode, 1, completed.stderr)
                     self.assertEqual(completed.stdout, "")
                     output = destination.read_bytes()
@@ -126,15 +153,22 @@ class CommandLineTests(unittest.TestCase):
                     self.assertIn("😀".encode("utf-8"), output)
                     text = output.decode("utf-8")
                     if output_format == "json":
-                        self.assertFalse(json.loads(text)["ok"])
-                    else:
+                        document = json.loads(text)
+                        self.assertFalse(document["ok"])
+                        self.assertNotIn("ast", document)
+                    elif output_format == "tree":
                         self.assertTrue(text.startswith("Module @1:1\n"))
+                    else:
+                        self.assertIn(": lexical:", text)
+                        self.assertIn(": syntax:", text)
+                        for line in text.splitlines():
+                            self.assertRegex(line, r"^\d+:\d+: (lexical|syntax|semantic)(?: \[[^]]+\])?: ")
 
     def test_utf8_bom_and_crlf_keep_semantic_positions(self):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "bom.funny"
             source.write_bytes(b"\xef\xbb\xbf" + UNKNOWN.replace("\n", "\r\n").encode("utf-8"))
-            completed = self.command("check", source)
+            completed = self.command("check", source, "--format", "json")
             self.assertEqual(completed.returncode, 1, completed.stderr)
             diagnostic = json.loads(completed.stdout)["diagnostics"][0]
             self.assertEqual((diagnostic["line"], diagnostic["col"]), (2, 9))
@@ -142,12 +176,13 @@ class CommandLineTests(unittest.TestCase):
     def test_explicit_lexer_table_is_used(self):
         completed = self.command("check", "--text", SIMPLE, "--table", ROOT / "HW1/generated/dfa.min.json")
         self.assertEqual(completed.returncode, 0, completed.stderr)
-        self.assertTrue(json.loads(completed.stdout)["ok"])
+        self.assertEqual(completed.stdout, "Ошибок нет.\n")
 
     def test_default_cases_and_table_are_independent_of_working_directory(self):
         with tempfile.TemporaryDirectory() as directory:
             completed = self.command("check", "--text", SIMPLE, cwd=directory)
             self.assertEqual(completed.returncode, 0, completed.stderr)
+            self.assertEqual(completed.stdout, "Ошибок нет.\n")
             completed = self.command("test", cwd=directory)
             self.assertEqual(completed.returncode, 0, completed.stderr + completed.stdout)
             count = len(json.loads(CASES.read_text(encoding="utf-8"))["cases"])
@@ -229,7 +264,7 @@ class CommandLineTests(unittest.TestCase):
         self.assertNotIn("Traceback", completed.stderr)
 
     def test_full_ast_snapshot_reports_first_different_field(self):
-        actual = json.loads(self.command("check", "--text", SIMPLE).stdout)["ast"]
+        actual = json.loads(self.command("check", "--text", SIMPLE, "--format", "json").stdout)["ast"]
         actual["declarations"][0]["name"] = "wrong_name"
         case = {"name": "wrong_ast", "input": SIMPLE, "valid": True, "ast": actual}
         completed = self.fixture_command([case], "-v")
@@ -238,7 +273,8 @@ class CommandLineTests(unittest.TestCase):
 
     def test_argument_errors_return_two(self):
         for arguments in ((), ("check",), ("check", "ignored", "--text", SIMPLE),
-                          ("check", "--text", SIMPLE, "--format", "yaml"), ("unknown",)):
+                          ("check", "--text", SIMPLE, "--format", "yaml"),
+                          ("check", "--text", SIMPLE, "--format", "diagnostics"), ("unknown",)):
             with self.subTest(arguments=arguments):
                 completed = self.command(*arguments)
                 self.assertEqual(completed.returncode, 2)

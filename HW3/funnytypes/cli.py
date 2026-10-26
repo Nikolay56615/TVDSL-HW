@@ -1,6 +1,6 @@
 """Командная строка: python -m HW3.funnytypes <команда>
 
-    check   проверить файл или --text, вывести типизированный AST и ошибки
+    check   проверить файл или --text; при ошибках вывести только сообщения
     test    проверить программы, диагностику и типы из tests/cases.json
 """
 
@@ -31,9 +31,14 @@ def cmd_check(args):
             source = stream.read()
     result = check(source, args.table)
     if args.format == "json":
-        output = json.dumps(result.to_dict(), ensure_ascii=False, indent=2) + "\n"
+        document = result.to_dict()
+        if not result.ok:
+            document.pop("ast", None)
+        output = json.dumps(document, ensure_ascii=False, indent=2) + "\n"
     else:
-        output = "\n".join(tree_lines(result.ast)) + "\n"
+        output = "Ошибок нет.\n" if args.format is None and result.ok else ""
+        if args.format == "tree":
+            output = "\n".join(tree_lines(result.ast)) + "\n"
         for diagnostic in result.to_dict()["diagnostics"]:
             code = " [%s]" % diagnostic["code"] if diagnostic.get("code") else ""
             output += "%d:%d: %s%s: %s\n" % (
@@ -212,10 +217,12 @@ def main():
             stream.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(prog="funnytypes", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    command = sub.add_parser("check", help="проверить файл или --text; вывести типизированный AST и ошибки")
+    command = sub.add_parser("check", help="проверить файл или --text; при ошибках вывести только сообщения")
     command.add_argument("file", nargs="?")
     command.add_argument("--text")
-    command.add_argument("--format", choices=("json", "tree"), default="json")
+    command.add_argument("--format", choices=("json", "tree"),
+                         help="по умолчанию: сообщения об ошибках или «Ошибок нет»; "
+                              "tree — дерево даже при ошибках; json — результат в JSON")
     command.add_argument("--out", help="записать результат в файл UTF-8")
     command.add_argument("--table", help="таблица ДКА HW1 в JSON; штатный путь определяется по модулю")
     command.set_defaults(func=cmd_check)
