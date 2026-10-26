@@ -1,0 +1,14 @@
+{
+  "before": {
+    "result": [
+      12
+    ]
+  },
+  "after": {
+    "result": [
+      12
+    ]
+  },
+  "equivalent": true,
+  "comparison": "equal"
+}

@@ -1,0 +1,6 @@
+main(x:int) returns r:int uses a:int,b:int,unused:int {
+    a = 2 + 3;
+    b = a * 1;
+    unused = 10 + 20;
+    r = x + b + 0;
+}

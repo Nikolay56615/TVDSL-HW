@@ -1,0 +1,18 @@
+{
+  "examples": [
+    {"file":"good_basic.funny","function":"main","args":[7],"result":[12]},
+    {"file":"good_cse.funny","function":"main","args":[2,3],"result":[10]},
+    {"file":"good_branches.funny","function":"main","args":[-7],"result":[7]},
+    {"file":"good_loop.funny","function":"main","args":[10],"result":[55]},
+    {"file":"good_arrays.funny","function":"main","args":[[1,2,3]],"result":[[9,2,3],1]},
+    {"file":"good_tuple.funny","function":"main","args":[],"result":[21]},
+    {"file":"good_recursion.funny","function":"main","args":[6],"result":[720]},
+    {"file":"good_short_circuit.funny","function":"main","args":[[]],"result":[0]},
+    {"file":"good_integer_edges.funny","function":"main","args":[],"result":[-2147483648,-2147483648,0]},
+    {"file":"good_contracts.funny","function":"main","args":[-3],"result":[-3]},
+    {"file":"trap_division.funny","function":"main","args":[],"error":"division_by_zero"},
+    {"file":"trap_array.funny","function":"main","args":[[]],"error":"array_bounds"},
+    {"file":"bad_parameter.funny","valid":false,"diagnostics":[{"phase":"semantic","code":"readonly_assignment"}]},
+    {"file":"bad_syntax.funny","valid":false,"diagnostics":[{"phase":"syntax"}]}
+  ]
+}

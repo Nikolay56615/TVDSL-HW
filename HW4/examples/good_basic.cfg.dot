@@ -1,0 +1,5 @@
+digraph "cfg_main" {
+  node [shape=box, fontname="monospace"];
+  rankdir=TB;
+  "B0" [label="B0:\nt:9 = copy v:x  [5:9]\nt:11 = binary + t:9, 5  [5:11]\nt:13 = copy t:11  [5:15]\nv:r = copy t:13  [5:5]\nreturn v:r  [1:1]"];
+}

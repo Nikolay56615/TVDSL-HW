@@ -1,0 +1,11 @@
+positive(x:int) => x > 0;
+
+main(x:int)
+requires positive(x)
+returns r:int
+ensures r == x
+{
+    assert forall(i:int | i == i);
+    assume false;
+    r = x;
+}

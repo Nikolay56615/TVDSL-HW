@@ -1,0 +1,4 @@
+main(a:int[]) returns r:int uses unused:int {
+    unused = a[length(a)];
+    r = 7;
+}

@@ -1,0 +1,720 @@
+{
+  "ok": true,
+  "before": {
+    "version": 1,
+    "functions": [
+      {
+        "name": "main",
+        "params": [
+          {
+            "name": "a",
+            "type": "int"
+          },
+          {
+            "name": "b",
+            "type": "int"
+          }
+        ],
+        "returns": [
+          {
+            "name": "r",
+            "type": "int"
+          }
+        ],
+        "locals": [
+          {
+            "name": "x",
+            "type": "int"
+          },
+          {
+            "name": "y",
+            "type": "int"
+          }
+        ],
+        "types": {
+          "v:a": "int",
+          "v:b": "int",
+          "v:r": "int",
+          "v:x": "int",
+          "v:y": "int",
+          "t:0": "int",
+          "t:1": "int",
+          "t:2": "int",
+          "t:3": "int",
+          "t:4": "int",
+          "t:5": "int",
+          "t:6": "int",
+          "t:7": "int",
+          "t:8": "int"
+        },
+        "entry": "B0",
+        "blocks": [
+          {
+            "label": "B0",
+            "instructions": [
+              {
+                "op": "copy",
+                "dest": "t:0",
+                "args": [
+                  {
+                    "var": "v:a"
+                  }
+                ],
+                "pos": {
+                  "line": 2,
+                  "col": 9
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:1",
+                "args": [
+                  {
+                    "var": "v:b"
+                  }
+                ],
+                "pos": {
+                  "line": 2,
+                  "col": 13
+                }
+              },
+              {
+                "op": "binary",
+                "dest": "t:2",
+                "args": [
+                  {
+                    "var": "t:0"
+                  },
+                  {
+                    "var": "t:1"
+                  }
+                ],
+                "operator": "+",
+                "pos": {
+                  "line": 2,
+                  "col": 11
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "v:x",
+                "args": [
+                  {
+                    "var": "t:2"
+                  }
+                ],
+                "pos": {
+                  "line": 2,
+                  "col": 5
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:3",
+                "args": [
+                  {
+                    "var": "v:a"
+                  }
+                ],
+                "pos": {
+                  "line": 3,
+                  "col": 9
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:4",
+                "args": [
+                  {
+                    "var": "v:b"
+                  }
+                ],
+                "pos": {
+                  "line": 3,
+                  "col": 13
+                }
+              },
+              {
+                "op": "binary",
+                "dest": "t:5",
+                "args": [
+                  {
+                    "var": "t:3"
+                  },
+                  {
+                    "var": "t:4"
+                  }
+                ],
+                "operator": "+",
+                "pos": {
+                  "line": 3,
+                  "col": 11
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "v:y",
+                "args": [
+                  {
+                    "var": "t:5"
+                  }
+                ],
+                "pos": {
+                  "line": 3,
+                  "col": 5
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:6",
+                "args": [
+                  {
+                    "var": "v:x"
+                  }
+                ],
+                "pos": {
+                  "line": 4,
+                  "col": 9
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:7",
+                "args": [
+                  {
+                    "var": "v:y"
+                  }
+                ],
+                "pos": {
+                  "line": 4,
+                  "col": 13
+                }
+              },
+              {
+                "op": "binary",
+                "dest": "t:8",
+                "args": [
+                  {
+                    "var": "t:6"
+                  },
+                  {
+                    "var": "t:7"
+                  }
+                ],
+                "operator": "+",
+                "pos": {
+                  "line": 4,
+                  "col": 11
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "v:r",
+                "args": [
+                  {
+                    "var": "t:8"
+                  }
+                ],
+                "pos": {
+                  "line": 4,
+                  "col": 5
+                }
+              },
+              {
+                "op": "return",
+                "args": [
+                  {
+                    "var": "v:r"
+                  }
+                ],
+                "pos": {
+                  "line": 1,
+                  "col": 1
+                }
+              }
+            ]
+          }
+        ],
+        "contracts": {
+          "requires": {
+            "kind": "Bool",
+            "pos": {
+              "line": 1,
+              "col": 1
+            },
+            "value": true,
+            "inferred_type": "bool"
+          },
+          "ensures": {
+            "kind": "Bool",
+            "pos": {
+              "line": 1,
+              "col": 1
+            },
+            "value": false,
+            "inferred_type": "bool"
+          },
+          "invariants": []
+        }
+      }
+    ],
+    "formulas": []
+  },
+  "after": {
+    "version": 1,
+    "functions": [
+      {
+        "name": "main",
+        "params": [
+          {
+            "name": "a",
+            "type": "int"
+          },
+          {
+            "name": "b",
+            "type": "int"
+          }
+        ],
+        "returns": [
+          {
+            "name": "r",
+            "type": "int"
+          }
+        ],
+        "locals": [
+          {
+            "name": "x",
+            "type": "int"
+          },
+          {
+            "name": "y",
+            "type": "int"
+          }
+        ],
+        "types": {
+          "v:a": "int",
+          "v:b": "int",
+          "v:r": "int",
+          "v:x": "int",
+          "v:y": "int",
+          "t:0": "int",
+          "t:1": "int",
+          "t:2": "int",
+          "t:3": "int",
+          "t:4": "int",
+          "t:5": "int",
+          "t:6": "int",
+          "t:7": "int",
+          "t:8": "int"
+        },
+        "entry": "B0",
+        "blocks": [
+          {
+            "label": "B0",
+            "instructions": [
+              {
+                "op": "copy",
+                "dest": "t:0",
+                "args": [
+                  {
+                    "var": "v:a"
+                  }
+                ],
+                "pos": {
+                  "line": 2,
+                  "col": 9
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:1",
+                "args": [
+                  {
+                    "var": "v:b"
+                  }
+                ],
+                "pos": {
+                  "line": 2,
+                  "col": 13
+                }
+              },
+              {
+                "op": "binary",
+                "dest": "t:2",
+                "args": [
+                  {
+                    "var": "t:0"
+                  },
+                  {
+                    "var": "t:1"
+                  }
+                ],
+                "operator": "+",
+                "pos": {
+                  "line": 2,
+                  "col": 11
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "v:x",
+                "args": [
+                  {
+                    "var": "t:2"
+                  }
+                ],
+                "pos": {
+                  "line": 2,
+                  "col": 5
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:5",
+                "pos": {
+                  "line": 3,
+                  "col": 11
+                },
+                "args": [
+                  {
+                    "var": "t:2"
+                  }
+                ]
+              },
+              {
+                "op": "copy",
+                "dest": "v:y",
+                "args": [
+                  {
+                    "var": "t:5"
+                  }
+                ],
+                "pos": {
+                  "line": 3,
+                  "col": 5
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:6",
+                "args": [
+                  {
+                    "var": "v:x"
+                  }
+                ],
+                "pos": {
+                  "line": 4,
+                  "col": 9
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:7",
+                "args": [
+                  {
+                    "var": "v:y"
+                  }
+                ],
+                "pos": {
+                  "line": 4,
+                  "col": 13
+                }
+              },
+              {
+                "op": "binary",
+                "dest": "t:8",
+                "args": [
+                  {
+                    "var": "t:6"
+                  },
+                  {
+                    "var": "t:7"
+                  }
+                ],
+                "operator": "+",
+                "pos": {
+                  "line": 4,
+                  "col": 11
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "v:r",
+                "args": [
+                  {
+                    "var": "t:8"
+                  }
+                ],
+                "pos": {
+                  "line": 4,
+                  "col": 5
+                }
+              },
+              {
+                "op": "return",
+                "args": [
+                  {
+                    "var": "v:r"
+                  }
+                ],
+                "pos": {
+                  "line": 1,
+                  "col": 1
+                }
+              }
+            ]
+          }
+        ],
+        "contracts": {
+          "requires": {
+            "kind": "Bool",
+            "pos": {
+              "line": 1,
+              "col": 1
+            },
+            "value": true,
+            "inferred_type": "bool"
+          },
+          "ensures": {
+            "kind": "Bool",
+            "pos": {
+              "line": 1,
+              "col": 1
+            },
+            "value": false,
+            "inferred_type": "bool"
+          },
+          "invariants": []
+        }
+      }
+    ],
+    "formulas": []
+  },
+  "diagnostics": [],
+  "analysis_before": {
+    "main": {
+      "cfg": {
+        "B0": {
+          "successors": [],
+          "predecessors": [],
+          "reachable": true
+        }
+      },
+      "blocks": {
+        "B0": {
+          "use": [
+            "v:a",
+            "v:b"
+          ],
+          "defs": [
+            "t:0",
+            "t:1",
+            "t:2",
+            "t:3",
+            "t:4",
+            "t:5",
+            "t:6",
+            "t:7",
+            "t:8",
+            "v:r",
+            "v:x",
+            "v:y"
+          ],
+          "live_in": [
+            "v:a",
+            "v:b"
+          ],
+          "live_out": []
+        }
+      },
+      "interference": {
+        "t:0": [
+          "t:1",
+          "v:a",
+          "v:b"
+        ],
+        "t:1": [
+          "t:0",
+          "v:a",
+          "v:b"
+        ],
+        "t:2": [
+          "v:a",
+          "v:b"
+        ],
+        "t:3": [
+          "t:4",
+          "v:b",
+          "v:x"
+        ],
+        "t:4": [
+          "t:3",
+          "v:x"
+        ],
+        "t:5": [
+          "v:x"
+        ],
+        "t:6": [
+          "t:7",
+          "v:y"
+        ],
+        "t:7": [
+          "t:6"
+        ],
+        "t:8": [],
+        "v:a": [
+          "t:0",
+          "t:1",
+          "t:2",
+          "v:b",
+          "v:x"
+        ],
+        "v:b": [
+          "t:0",
+          "t:1",
+          "t:2",
+          "t:3",
+          "v:a",
+          "v:x"
+        ],
+        "v:r": [],
+        "v:x": [
+          "t:3",
+          "t:4",
+          "t:5",
+          "v:a",
+          "v:b",
+          "v:y"
+        ],
+        "v:y": [
+          "t:6",
+          "v:x"
+        ]
+      },
+      "colors": {
+        "t:0": 1,
+        "t:1": 3,
+        "t:2": 1,
+        "t:3": 2,
+        "t:4": 0,
+        "t:5": 0,
+        "t:6": 0,
+        "t:7": 1,
+        "t:8": 0,
+        "v:a": 2,
+        "v:b": 0,
+        "v:r": 0,
+        "v:x": 1,
+        "v:y": 2
+      },
+      "color_count": 4
+    }
+  },
+  "analysis_after": {
+    "main": {
+      "cfg": {
+        "B0": {
+          "successors": [],
+          "predecessors": [],
+          "reachable": true
+        }
+      },
+      "blocks": {
+        "B0": {
+          "use": [
+            "v:a",
+            "v:b"
+          ],
+          "defs": [
+            "t:0",
+            "t:1",
+            "t:2",
+            "t:5",
+            "t:6",
+            "t:7",
+            "t:8",
+            "v:r",
+            "v:x",
+            "v:y"
+          ],
+          "live_in": [
+            "v:a",
+            "v:b"
+          ],
+          "live_out": []
+        }
+      },
+      "interference": {
+        "t:0": [
+          "t:1",
+          "v:b"
+        ],
+        "t:1": [
+          "t:0"
+        ],
+        "t:2": [
+          "v:x"
+        ],
+        "t:5": [
+          "v:x"
+        ],
+        "t:6": [
+          "t:7",
+          "v:y"
+        ],
+        "t:7": [
+          "t:6"
+        ],
+        "t:8": [],
+        "v:a": [
+          "v:b"
+        ],
+        "v:b": [
+          "t:0",
+          "v:a"
+        ],
+        "v:r": [],
+        "v:x": [
+          "t:2",
+          "t:5",
+          "v:y"
+        ],
+        "v:y": [
+          "t:6",
+          "v:x"
+        ]
+      },
+      "colors": {
+        "t:0": 0,
+        "t:1": 1,
+        "t:2": 1,
+        "t:5": 1,
+        "t:6": 0,
+        "t:7": 1,
+        "t:8": 0,
+        "v:a": 0,
+        "v:b": 1,
+        "v:r": 0,
+        "v:x": 0,
+        "v:y": 1
+      },
+      "color_count": 2
+    }
+  },
+  "metrics": {
+    "before": {
+      "instructions": 13,
+      "temporaries": 9,
+      "blocks": 1,
+      "colors": 4
+    },
+    "after": {
+      "instructions": 11,
+      "temporaries": 7,
+      "blocks": 1,
+      "colors": 2
+    },
+    "instructions_removed": 2,
+    "temporaries_removed": 2
+  }
+}

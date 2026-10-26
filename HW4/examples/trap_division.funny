@@ -1,0 +1,4 @@
+main() returns r:int uses unused:int {
+    unused = 1 / 0;
+    r = 7;
+}

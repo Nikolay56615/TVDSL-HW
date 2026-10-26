@@ -1,0 +1,5 @@
+main() returns overflow:int,division:int,zero:int {
+    overflow = 2147483647 + 1;
+    division = -2147483648 / -1;
+    zero = -0 / -3;
+}

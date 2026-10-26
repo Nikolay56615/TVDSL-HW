@@ -1,0 +1,61 @@
+IR ДО оптимизаций
+module IR v1
+
+function main(a:int, b:int) returns r:int
+  locals x:int, y:int
+  requires true
+  ensures false
+  entry B0
+B0:
+  t:0 = copy v:a  [2:9]
+  t:1 = copy v:b  [2:13]
+  t:2 = binary + t:0, t:1  [2:11]
+  v:x = copy t:2  [2:5]
+  t:3 = copy v:a  [3:9]
+  t:4 = copy v:b  [3:13]
+  t:5 = binary + t:3, t:4  [3:11]
+  v:y = copy t:5  [3:5]
+  t:6 = copy v:x  [4:9]
+  t:7 = copy v:y  [4:13]
+  t:8 = binary + t:6, t:7  [4:11]
+  v:r = copy t:8  [4:5]
+  return v:r  [1:1]
+
+IR ПОСЛЕ оптимизаций
+module IR v1
+
+function main(a:int, b:int) returns r:int
+  locals x:int, y:int
+  requires true
+  ensures false
+  entry B0
+B0:
+  t:0 = copy v:a  [2:9]
+  t:1 = copy v:b  [2:13]
+  t:2 = binary + t:0, t:1  [2:11]
+  v:x = copy t:2  [2:5]
+  t:5 = copy t:2  [3:11]
+  v:y = copy t:5  [3:5]
+  t:6 = copy v:x  [4:9]
+  t:7 = copy v:y  [4:13]
+  t:8 = binary + t:6, t:7  [4:11]
+  v:r = copy t:8  [4:5]
+  return v:r  [1:1]
+
+Метрики
+{
+  "before": {
+    "instructions": 13,
+    "temporaries": 9,
+    "blocks": 1,
+    "colors": 4
+  },
+  "after": {
+    "instructions": 11,
+    "temporaries": 7,
+    "blocks": 1,
+    "colors": 2
+  },
+  "instructions_removed": 2,
+  "temporaries_removed": 2
+}

@@ -1,0 +1,4 @@
+main(x:int) returns r:int {
+    x = 1;
+    r = x;
+}

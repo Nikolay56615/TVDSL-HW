@@ -1,0 +1,4 @@
+main(a:int[]) returns r:int {
+    if (length(a) > 0 and a[0] > 0) r = 1;
+    else r = 0;
+}

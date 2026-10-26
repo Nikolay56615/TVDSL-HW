@@ -1,0 +1,6 @@
+main(a:int[]) returns b:int[],original:int uses copy:int[] {
+    b = a;
+    copy = a;
+    b[0] = 9;
+    original = copy[0];
+}

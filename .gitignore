@@ -17,6 +17,8 @@ venv/
 /HW2/docs/
 /HW3/REPORT.md
 /HW3/docs/
+/HW4/REPORT.md
+/HW4/docs/
 
 # Результаты запуска
 /ast.json
@@ -25,3 +27,17 @@ venv/
 /typed_ast.json
 /HW3/typed_ast.json
 /HW3/ast.json
+/ir.json
+/HW4/ir.json
+/ir.txt
+/HW4/ir.txt
+/cfg.dot
+/HW4/cfg.dot
+/interference.dot
+/HW4/interference.dot
+/conflicts.dot
+/HW4/conflicts.dot
+/loop.dot
+/HW4/loop.dot
+/cfg.svg
+/HW4/cfg.svg

@@ -1,0 +1,713 @@
+{
+  "ok": true,
+  "before": {
+    "version": 1,
+    "functions": [
+      {
+        "name": "main",
+        "params": [
+          {
+            "name": "x",
+            "type": "int"
+          }
+        ],
+        "returns": [
+          {
+            "name": "r",
+            "type": "int"
+          }
+        ],
+        "locals": [
+          {
+            "name": "a",
+            "type": "int"
+          },
+          {
+            "name": "b",
+            "type": "int"
+          },
+          {
+            "name": "unused",
+            "type": "int"
+          }
+        ],
+        "types": {
+          "v:x": "int",
+          "v:r": "int",
+          "v:a": "int",
+          "v:b": "int",
+          "v:unused": "int",
+          "t:0": "int",
+          "t:1": "int",
+          "t:2": "int",
+          "t:3": "int",
+          "t:4": "int",
+          "t:5": "int",
+          "t:6": "int",
+          "t:7": "int",
+          "t:8": "int",
+          "t:9": "int",
+          "t:10": "int",
+          "t:11": "int",
+          "t:12": "int",
+          "t:13": "int"
+        },
+        "entry": "B0",
+        "blocks": [
+          {
+            "label": "B0",
+            "instructions": [
+              {
+                "op": "copy",
+                "dest": "t:0",
+                "args": [
+                  {
+                    "const": 2
+                  }
+                ],
+                "pos": {
+                  "line": 2,
+                  "col": 9
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:1",
+                "args": [
+                  {
+                    "const": 3
+                  }
+                ],
+                "pos": {
+                  "line": 2,
+                  "col": 13
+                }
+              },
+              {
+                "op": "binary",
+                "dest": "t:2",
+                "args": [
+                  {
+                    "var": "t:0"
+                  },
+                  {
+                    "var": "t:1"
+                  }
+                ],
+                "operator": "+",
+                "pos": {
+                  "line": 2,
+                  "col": 11
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "v:a",
+                "args": [
+                  {
+                    "var": "t:2"
+                  }
+                ],
+                "pos": {
+                  "line": 2,
+                  "col": 5
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:3",
+                "args": [
+                  {
+                    "var": "v:a"
+                  }
+                ],
+                "pos": {
+                  "line": 3,
+                  "col": 9
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:4",
+                "args": [
+                  {
+                    "const": 1
+                  }
+                ],
+                "pos": {
+                  "line": 3,
+                  "col": 13
+                }
+              },
+              {
+                "op": "binary",
+                "dest": "t:5",
+                "args": [
+                  {
+                    "var": "t:3"
+                  },
+                  {
+                    "var": "t:4"
+                  }
+                ],
+                "operator": "*",
+                "pos": {
+                  "line": 3,
+                  "col": 11
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "v:b",
+                "args": [
+                  {
+                    "var": "t:5"
+                  }
+                ],
+                "pos": {
+                  "line": 3,
+                  "col": 5
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:6",
+                "args": [
+                  {
+                    "const": 10
+                  }
+                ],
+                "pos": {
+                  "line": 4,
+                  "col": 14
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:7",
+                "args": [
+                  {
+                    "const": 20
+                  }
+                ],
+                "pos": {
+                  "line": 4,
+                  "col": 19
+                }
+              },
+              {
+                "op": "binary",
+                "dest": "t:8",
+                "args": [
+                  {
+                    "var": "t:6"
+                  },
+                  {
+                    "var": "t:7"
+                  }
+                ],
+                "operator": "+",
+                "pos": {
+                  "line": 4,
+                  "col": 17
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "v:unused",
+                "args": [
+                  {
+                    "var": "t:8"
+                  }
+                ],
+                "pos": {
+                  "line": 4,
+                  "col": 5
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:9",
+                "args": [
+                  {
+                    "var": "v:x"
+                  }
+                ],
+                "pos": {
+                  "line": 5,
+                  "col": 9
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:10",
+                "args": [
+                  {
+                    "var": "v:b"
+                  }
+                ],
+                "pos": {
+                  "line": 5,
+                  "col": 13
+                }
+              },
+              {
+                "op": "binary",
+                "dest": "t:11",
+                "args": [
+                  {
+                    "var": "t:9"
+                  },
+                  {
+                    "var": "t:10"
+                  }
+                ],
+                "operator": "+",
+                "pos": {
+                  "line": 5,
+                  "col": 11
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:12",
+                "args": [
+                  {
+                    "const": 0
+                  }
+                ],
+                "pos": {
+                  "line": 5,
+                  "col": 17
+                }
+              },
+              {
+                "op": "binary",
+                "dest": "t:13",
+                "args": [
+                  {
+                    "var": "t:11"
+                  },
+                  {
+                    "var": "t:12"
+                  }
+                ],
+                "operator": "+",
+                "pos": {
+                  "line": 5,
+                  "col": 15
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "v:r",
+                "args": [
+                  {
+                    "var": "t:13"
+                  }
+                ],
+                "pos": {
+                  "line": 5,
+                  "col": 5
+                }
+              },
+              {
+                "op": "return",
+                "args": [
+                  {
+                    "var": "v:r"
+                  }
+                ],
+                "pos": {
+                  "line": 1,
+                  "col": 1
+                }
+              }
+            ]
+          }
+        ],
+        "contracts": {
+          "requires": {
+            "kind": "Bool",
+            "pos": {
+              "line": 1,
+              "col": 1
+            },
+            "value": true,
+            "inferred_type": "bool"
+          },
+          "ensures": {
+            "kind": "Bool",
+            "pos": {
+              "line": 1,
+              "col": 1
+            },
+            "value": false,
+            "inferred_type": "bool"
+          },
+          "invariants": []
+        }
+      }
+    ],
+    "formulas": []
+  },
+  "after": {
+    "version": 1,
+    "functions": [
+      {
+        "name": "main",
+        "params": [
+          {
+            "name": "x",
+            "type": "int"
+          }
+        ],
+        "returns": [
+          {
+            "name": "r",
+            "type": "int"
+          }
+        ],
+        "locals": [
+          {
+            "name": "a",
+            "type": "int"
+          },
+          {
+            "name": "b",
+            "type": "int"
+          },
+          {
+            "name": "unused",
+            "type": "int"
+          }
+        ],
+        "types": {
+          "v:x": "int",
+          "v:r": "int",
+          "v:a": "int",
+          "v:b": "int",
+          "v:unused": "int",
+          "t:0": "int",
+          "t:1": "int",
+          "t:2": "int",
+          "t:3": "int",
+          "t:4": "int",
+          "t:5": "int",
+          "t:6": "int",
+          "t:7": "int",
+          "t:8": "int",
+          "t:9": "int",
+          "t:10": "int",
+          "t:11": "int",
+          "t:12": "int",
+          "t:13": "int"
+        },
+        "entry": "B0",
+        "blocks": [
+          {
+            "label": "B0",
+            "instructions": [
+              {
+                "op": "copy",
+                "dest": "t:9",
+                "args": [
+                  {
+                    "var": "v:x"
+                  }
+                ],
+                "pos": {
+                  "line": 5,
+                  "col": 9
+                }
+              },
+              {
+                "op": "binary",
+                "dest": "t:11",
+                "args": [
+                  {
+                    "var": "t:9"
+                  },
+                  {
+                    "const": 5
+                  }
+                ],
+                "operator": "+",
+                "pos": {
+                  "line": 5,
+                  "col": 11
+                }
+              },
+              {
+                "op": "copy",
+                "dest": "t:13",
+                "pos": {
+                  "line": 5,
+                  "col": 15
+                },
+                "args": [
+                  {
+                    "var": "t:11"
+                  }
+                ]
+              },
+              {
+                "op": "copy",
+                "dest": "v:r",
+                "args": [
+                  {
+                    "var": "t:13"
+                  }
+                ],
+                "pos": {
+                  "line": 5,
+                  "col": 5
+                }
+              },
+              {
+                "op": "return",
+                "args": [
+                  {
+                    "var": "v:r"
+                  }
+                ],
+                "pos": {
+                  "line": 1,
+                  "col": 1
+                }
+              }
+            ]
+          }
+        ],
+        "contracts": {
+          "requires": {
+            "kind": "Bool",
+            "pos": {
+              "line": 1,
+              "col": 1
+            },
+            "value": true,
+            "inferred_type": "bool"
+          },
+          "ensures": {
+            "kind": "Bool",
+            "pos": {
+              "line": 1,
+              "col": 1
+            },
+            "value": false,
+            "inferred_type": "bool"
+          },
+          "invariants": []
+        }
+      }
+    ],
+    "formulas": []
+  },
+  "diagnostics": [],
+  "analysis_before": {
+    "main": {
+      "cfg": {
+        "B0": {
+          "successors": [],
+          "predecessors": [],
+          "reachable": true
+        }
+      },
+      "blocks": {
+        "B0": {
+          "use": [
+            "v:x"
+          ],
+          "defs": [
+            "t:0",
+            "t:1",
+            "t:10",
+            "t:11",
+            "t:12",
+            "t:13",
+            "t:2",
+            "t:3",
+            "t:4",
+            "t:5",
+            "t:6",
+            "t:7",
+            "t:8",
+            "t:9",
+            "v:a",
+            "v:b",
+            "v:r",
+            "v:unused"
+          ],
+          "live_in": [
+            "v:x"
+          ],
+          "live_out": []
+        }
+      },
+      "interference": {
+        "t:0": [
+          "t:1",
+          "v:x"
+        ],
+        "t:1": [
+          "t:0",
+          "v:x"
+        ],
+        "t:10": [
+          "t:9"
+        ],
+        "t:11": [
+          "t:12"
+        ],
+        "t:12": [
+          "t:11"
+        ],
+        "t:13": [],
+        "t:2": [
+          "v:x"
+        ],
+        "t:3": [
+          "t:4",
+          "v:x"
+        ],
+        "t:4": [
+          "t:3",
+          "v:x"
+        ],
+        "t:5": [
+          "v:x"
+        ],
+        "t:6": [
+          "t:7",
+          "v:b",
+          "v:x"
+        ],
+        "t:7": [
+          "t:6",
+          "v:b",
+          "v:x"
+        ],
+        "t:8": [
+          "v:b",
+          "v:x"
+        ],
+        "t:9": [
+          "t:10",
+          "v:b"
+        ],
+        "v:a": [
+          "v:x"
+        ],
+        "v:b": [
+          "t:6",
+          "t:7",
+          "t:8",
+          "t:9",
+          "v:unused",
+          "v:x"
+        ],
+        "v:r": [],
+        "v:unused": [
+          "v:b",
+          "v:x"
+        ],
+        "v:x": [
+          "t:0",
+          "t:1",
+          "t:2",
+          "t:3",
+          "t:4",
+          "t:5",
+          "t:6",
+          "t:7",
+          "t:8",
+          "v:a",
+          "v:b",
+          "v:unused"
+        ]
+      },
+      "colors": {
+        "t:0": 1,
+        "t:1": 2,
+        "t:10": 1,
+        "t:11": 0,
+        "t:12": 1,
+        "t:13": 0,
+        "t:2": 1,
+        "t:3": 1,
+        "t:4": 2,
+        "t:5": 1,
+        "t:6": 2,
+        "t:7": 3,
+        "t:8": 2,
+        "t:9": 0,
+        "v:a": 1,
+        "v:b": 1,
+        "v:r": 0,
+        "v:unused": 2,
+        "v:x": 0
+      },
+      "color_count": 4
+    }
+  },
+  "analysis_after": {
+    "main": {
+      "cfg": {
+        "B0": {
+          "successors": [],
+          "predecessors": [],
+          "reachable": true
+        }
+      },
+      "blocks": {
+        "B0": {
+          "use": [
+            "v:x"
+          ],
+          "defs": [
+            "t:11",
+            "t:13",
+            "t:9",
+            "v:r"
+          ],
+          "live_in": [
+            "v:x"
+          ],
+          "live_out": []
+        }
+      },
+      "interference": {
+        "t:11": [],
+        "t:13": [],
+        "t:9": [],
+        "v:r": [],
+        "v:x": []
+      },
+      "colors": {
+        "t:11": 0,
+        "t:13": 0,
+        "t:9": 0,
+        "v:r": 0,
+        "v:x": 0
+      },
+      "color_count": 1
+    }
+  },
+  "metrics": {
+    "before": {
+      "instructions": 19,
+      "temporaries": 14,
+      "blocks": 1,
+      "colors": 4
+    },
+    "after": {
+      "instructions": 5,
+      "temporaries": 3,
+      "blocks": 1,
+      "colors": 1
+    },
+    "instructions_removed": 14,
+    "temporaries_removed": 11
+  }
+}

@@ -1,0 +1,4 @@
+main(x:int) returns r:int {
+    if (x >= 0) r = x;
+    else r = -x;
+}

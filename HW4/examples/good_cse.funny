@@ -1,0 +1,5 @@
+main(a:int,b:int) returns r:int uses x:int,y:int {
+    x = a + b;
+    y = a + b;
+    r = x + y;
+}
