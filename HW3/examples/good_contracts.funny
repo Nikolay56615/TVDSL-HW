@@ -1,0 +1,11 @@
+sorted(a:int[]) => forall(i:int | (i >= 0 and i + 1 < length(a)) → a[i] <= a[i + 1]);
+
+copy_sorted(a:int[])
+requires sorted(a)
+returns b:int[]
+ensures sorted(b)
+uses saved {
+    saved = a;
+    b = saved;
+    assert forall(j:int | (j >= 0 and j < length(b)) → b[j] == a[j]);
+}

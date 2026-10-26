@@ -1,0 +1,9 @@
+pair(x:int) returns a:int, b:int { a = x; b = x + 1; }
+positive(x:int) => x > 0;
+
+main() returns r:int uses a:int, b:int {
+    r = pair(1);                 // Несколько результатов требуют присваивания кортежа.
+    a, b = pair();               // Не хватает аргумента.
+    r = positive(1);             // Формула разрешена только в предикате.
+    r = absent(1);               // Неизвестная функция.
+}

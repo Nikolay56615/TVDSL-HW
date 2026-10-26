@@ -1,0 +1,5 @@
+main(x:int) returns r:int uses doubled:int, next {
+    doubled = x * 2;
+    next = doubled + 1;
+    r = next;
+}

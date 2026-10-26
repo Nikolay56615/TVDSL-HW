@@ -1,0 +1,460 @@
+{
+  "cases": [
+    {
+      "name": "Арифметика и деление",
+      "input": "f(x:int) returns r:int { r=(x+8)*2/4-1; }",
+      "valid": true,
+      "type_checks": [
+        {
+          "path": "declarations[0].body.statements[0].value.inferred_type",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "Явный тип локальной переменной",
+      "input": "f(x:int) returns r:int uses t:int { t=x+1; r=t; }",
+      "valid": true,
+      "type_checks": [
+        {
+          "path": "declarations[0].locals[0].inferred_type",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "Вывод int из первого присваивания",
+      "input": "f(x:int) returns r:int uses t { t=x+1; r=t; }",
+      "valid": true,
+      "type_checks": [
+        {
+          "path": "declarations[0].locals[0].inferred_type",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "Вывод int[] из копирования массива",
+      "input": "f(a:int[]) returns r:int[] uses b { b=a; r=b; }",
+      "valid": true,
+      "type_checks": [
+        {
+          "path": "declarations[0].locals[0].inferred_type",
+          "type": "int[]"
+        }
+      ]
+    },
+    {
+      "name": "Вывод массива из первого обновления",
+      "input": "f() returns r:int uses a { a[0]=42; r=length(a); }",
+      "valid": true,
+      "type_checks": [
+        {
+          "path": "declarations[0].locals[0].inferred_type",
+          "type": "int[]"
+        },
+        {
+          "path": "declarations[0].body.statements[0].value.inferred_type",
+          "type": "int[]"
+        }
+      ]
+    },
+    {
+      "name": "Индексирование и length",
+      "input": "f(a:int[]) returns r:int { r=a[length(a)-1]; }",
+      "valid": true
+    },
+    {
+      "name": "Обновление копии параметра",
+      "input": "f(a:int[]) returns r:int[] uses b:int[] { b=a; b[0]=7; r=b; }",
+      "valid": true
+    },
+    {
+      "name": "Два результата и вывод двух типов",
+      "input": "pair(x:int,a:int[]) returns n:int,b:int[] { n=x;b=a; } f(a:int[]) returns r:int uses n,b { n,b=pair(1,a); r=n; }",
+      "valid": true,
+      "type_checks": [
+        {
+          "path": "declarations[1].locals[0].inferred_type",
+          "type": "int"
+        },
+        {
+          "path": "declarations[1].locals[1].inferred_type",
+          "type": "int[]"
+        },
+        {
+          "path": "declarations[1].body.statements[0].value.inferred_type",
+          "type": [
+            "int",
+            "int[]"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Функция объявлена после вызова",
+      "input": "f(x:int) returns r:int { r=g(x); } g(x:int) returns r:int { r=x+1; }",
+      "valid": true
+    },
+    {
+      "name": "Взаимная рекурсия",
+      "input": "f(x:int) returns r:int { r=g(x); } g(x:int) returns r:int { r=f(x); }",
+      "valid": true
+    },
+    {
+      "name": "Рекурсивная функция",
+      "input": "f(x:int) returns r:int { if(x>0) r=f(x-1); else r=0; }",
+      "valid": true
+    },
+    {
+      "name": "Формула объявлена после контракта",
+      "input": "f(x:int) requires positive(x) returns r:int { r=x; } positive(x:int)=>x>0;",
+      "valid": true
+    },
+    {
+      "name": "Разные области requires и ensures",
+      "input": "f(x:int) requires x>=0 returns r:int ensures r>=x uses t { t=x+1; r=t; }",
+      "valid": true
+    },
+    {
+      "name": "Квантор и Unicode-стрелка",
+      "input": "sorted(a:int[])=>forall(i:int | i>=0 and i<length(a) → a[i]>=0); f(a:int[]) requires sorted(a) returns r:int { r=length(a); }",
+      "valid": true
+    },
+    {
+      "name": "Имя квантора переиспользуется после выхода",
+      "input": "f() returns r:int { assert forall(i:int | i>=0); assert exists(i:int | i<0); r=0; }",
+      "valid": true
+    },
+    {
+      "name": "Инвариант видит локальные и возвращаемые",
+      "input": "f(n:int) returns r:int uses i { i=0;r=0; while(i<n) invariant i>=0 and r>=0 { i=i+1;r=r+1; } }",
+      "valid": true
+    },
+    {
+      "name": "Ветви согласуют один тип локальной",
+      "input": "f() returns r:int uses t { if(true) t=1; else t=2; r=t; }",
+      "valid": true
+    },
+    {
+      "name": "Функция и переменная с одним именем",
+      "input": "g(x:int) returns r:int { r=x; } f() returns r:int uses g:int { g=2;r=g(g); }",
+      "valid": true
+    },
+    {
+      "name": "Логические выражения имеют bool",
+      "input": "f(x:int) returns r:int { assert not x==0 and true or false; r=x; }",
+      "valid": true,
+      "type_checks": [
+        {
+          "path": "declarations[0].body.statements[0].predicate.inferred_type",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "Квантор в requires может называться как возврат",
+      "input": "f(x:int) requires forall(r:int | r>=0) returns r:int { r=x; }",
+      "valid": true
+    },
+    {
+      "name": "Неизвестная переменная",
+      "input": "f() returns r:int {\n  r = missing;\n}",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "unknown_variable",
+          "line": 2,
+          "col": 7
+        }
+      ]
+    },
+    {
+      "name": "Неизвестная функция",
+      "input": "f() returns r:int { r=missing(1); }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "unknown_callable"
+        }
+      ]
+    },
+    {
+      "name": "Повторный параметр",
+      "input": "f(x:int,x:int) returns r:int {}",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "duplicate_name"
+        }
+      ]
+    },
+    {
+      "name": "Возврат повторяет имя параметра",
+      "input": "f(x:int) returns x:int {}",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "duplicate_name"
+        }
+      ]
+    },
+    {
+      "name": "Повторная локальная переменная",
+      "input": "f() returns r:int uses x:int,x:int {}",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "duplicate_name"
+        }
+      ]
+    },
+    {
+      "name": "Функция и формула повторяют имя",
+      "input": "f(x:int) returns r:int { r=x; } f(x:int)=>x>0;",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "duplicate_name"
+        }
+      ]
+    },
+    {
+      "name": "Запись в параметр",
+      "input": "f(x:int) returns r:int { x=1; r=x; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "readonly_assignment"
+        }
+      ]
+    },
+    {
+      "name": "Обновление массива-параметра",
+      "input": "f(a:int[]) returns r:int { a[0]=1; r=0; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "readonly_assignment"
+        }
+      ]
+    },
+    {
+      "name": "Массив в арифметическом выражении",
+      "input": "f(a:int[]) returns r:int { r=a+1; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "type_mismatch"
+        }
+      ]
+    },
+    {
+      "name": "Нецелый аргумент length",
+      "input": "f() returns r:int { r=length(1); }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "type_mismatch"
+        }
+      ]
+    },
+    {
+      "name": "Неверное число аргументов",
+      "input": "g(x:int) returns r:int { r=x; } f() returns r:int { r=g(); }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "argument_count"
+        }
+      ]
+    },
+    {
+      "name": "Неверный тип аргумента",
+      "input": "g(x:int) returns r:int { r=x; } f(a:int[]) returns r:int { r=g(a); }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "type_mismatch"
+        }
+      ]
+    },
+    {
+      "name": "Индекс массива имеет тип массива",
+      "input": "f(a:int[]) returns r:int { r=a[a]; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "type_mismatch"
+        }
+      ]
+    },
+    {
+      "name": "Обращение по индексу к int",
+      "input": "f(x:int) returns r:int { r=x[0]; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "type_mismatch"
+        }
+      ]
+    },
+    {
+      "name": "Массив присваивается int",
+      "input": "f(a:int[]) returns r:int { r=a; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "type_mismatch"
+        }
+      ]
+    },
+    {
+      "name": "Массив записывается в элемент массива",
+      "input": "f(a:int[]) returns r:int[] { r=a; r[0]=a; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "type_mismatch"
+        }
+      ]
+    },
+    {
+      "name": "Два результата в одном присваивании",
+      "input": "pair() returns x:int,y:int { x=1;y=2; } f() returns r:int { r=pair(); }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "result_count"
+        }
+      ]
+    },
+    {
+      "name": "Неверное число получателей результата",
+      "input": "pair() returns x:int,y:int { x=1;y=2; } f() returns r:int uses x:int,y:int { r,x,y=pair(); }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "result_count"
+        }
+      ]
+    },
+    {
+      "name": "Формула используется как значение",
+      "input": "p(x:int)=>x>0; f() returns r:int { r=p(1); }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "callable_context"
+        }
+      ]
+    },
+    {
+      "name": "Функция используется вместо формулы",
+      "input": "g() returns r:int { r=1; } f() returns r:int { assert g(); r=0; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "callable_context"
+        }
+      ]
+    },
+    {
+      "name": "requires не видит возвращаемое имя",
+      "input": "f(x:int) requires r>=0 returns r:int { r=x; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "unknown_variable"
+        }
+      ]
+    },
+    {
+      "name": "ensures не видит локальную переменную",
+      "input": "f() returns r:int ensures t>=0 uses t:int { t=1;r=t; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "unknown_variable"
+        }
+      ]
+    },
+    {
+      "name": "Имя квантора не выходит из предиката",
+      "input": "f() returns r:int { assert forall(i:int | i>=0); r=i; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "unknown_variable"
+        }
+      ]
+    },
+    {
+      "name": "Квантор повторяет видимое имя",
+      "input": "f(i:int) returns r:int { assert forall(i:int | i>=0); r=i; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "duplicate_name"
+        }
+      ]
+    },
+    {
+      "name": "Тип локальной переменной не выведен",
+      "input": "f() returns r:int uses x { r=0; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "unresolved_type"
+        }
+      ]
+    },
+    {
+      "name": "Чтение до первого присваивания",
+      "input": "f() returns r:int uses x { r=x; x=1; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "unresolved_type"
+        }
+      ]
+    },
+    {
+      "name": "Позднее присваивание противоречит первому",
+      "input": "f(a:int[]) returns r:int uses x { x=1;x=a;r=0; }",
+      "valid": false,
+      "diagnostics": [
+        {
+          "phase": "semantic",
+          "code": "type_mismatch"
+        }
+      ]
+    }
+  ]
+}

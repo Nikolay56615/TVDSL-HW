@@ -1,0 +1,11 @@
+copy_and_update(a:int[], i:int)
+requires i >= 0 and i < length(a)
+returns b:int[], r:int
+ensures length(b) == length(a)
+uses snapshot:int[], size {
+    snapshot = a;                 // Копирование массива в локальную переменную.
+    b = snapshot;
+    b[i] = b[i] + 1;              // Обновление возвращаемого массива, параметры только читаем.
+    size = length(b);
+    r = size;
+}

@@ -1,0 +1,7 @@
+main(a:int[], x:int) returns r:int uses array:int[], number:int {
+    x = 2;                       // Параметр нельзя изменять.
+    a[0] = 1;                    // Запрет распространяется на обновление массива.
+    number = a;                  // int[] несовместим с int.
+    array = x;                   // int несовместим с int[].
+    r = 1;
+}

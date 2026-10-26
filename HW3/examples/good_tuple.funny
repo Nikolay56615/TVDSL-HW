@@ -1,0 +1,9 @@
+pair(x:int, source:int[]) returns value:int, items:int[] {
+    value = x;
+    items = source;
+}
+
+main(a:int[]) returns r:int uses n, copied {
+    n, copied = pair(1, a);       // Оба типа выводятся из сигнатуры pair.
+    r = n + length(copied);
+}

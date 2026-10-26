@@ -1,0 +1,9 @@
+even(n:int) requires n >= 0 returns r:int {
+    if (n == 0) r = 1;
+    else r = odd(n - 1);          // Сигнатура odd известна до разбора её тела.
+}
+
+odd(n:int) requires n >= 0 returns r:int {
+    if (n == 0) r = 0;
+    else r = even(n - 1);
+}

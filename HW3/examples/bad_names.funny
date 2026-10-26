@@ -1,0 +1,4 @@
+main() returns r:int uses duplicated:int, duplicated:int {
+    r = missing + 1;
+    unknown = 2;
+}

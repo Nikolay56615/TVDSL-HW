@@ -15,8 +15,13 @@ venv/
 /HW1/docs/
 /HW2/REPORT.md
 /HW2/docs/
+/HW3/REPORT.md
+/HW3/docs/
 
 # Результаты запуска
 /ast.json
 /HW2/ast.json
 /HW1/dfa.svg
+/typed_ast.json
+/HW3/typed_ast.json
+/HW3/ast.json
