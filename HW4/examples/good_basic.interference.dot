@@ -1,8 +1,8 @@
 graph "interference_main" {
   node [shape=ellipse, fontname="monospace"];
-  "t:11" [label="t:11 [color=0]", style="filled", fillcolor="#cce5ff"];
-  "t:13" [label="t:13 [color=0]", style="filled", fillcolor="#cce5ff"];
-  "t:9" [label="t:9 [color=0]", style="filled", fillcolor="#cce5ff"];
+  "t:10" [label="t:10 [color=0]", style="filled", fillcolor="#cce5ff"];
+  "t:6" [label="t:6 [color=0]", style="filled", fillcolor="#cce5ff"];
+  "t:8" [label="t:8 [color=0]", style="filled", fillcolor="#cce5ff"];
   "v:r" [label="v:r [color=0]", style="filled", fillcolor="#cce5ff"];
   "v:x" [label="v:x [color=0]", style="filled", fillcolor="#cce5ff"];
 }

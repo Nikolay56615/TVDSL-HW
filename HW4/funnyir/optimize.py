@@ -2,9 +2,9 @@
 
 from copy import deepcopy
 
-from .analysis import analyze
+from .analysis import analyze, build_cfg
 from .cse import eliminate_common_expressions
-from .ir import definitions, uses
+from .ir import TERMINATORS, definitions, uses
 from .operations import evaluate_binary, evaluate_unary, i32
 
 
@@ -76,6 +76,17 @@ def _local_pass(function: dict, *, constants: bool, simplify: bool) -> None:
                         pass
                     else:
                         instruction = _copy(instruction, {"const": value})
+                if (
+                    instruction["op"] == "branch"
+                    and len(args) == 1
+                    and type(args[0].get("const")) is bool
+                ):
+                    target = instruction["then"] if args[0]["const"] else instruction["else"]
+                    instruction = {
+                        key: value for key, value in instruction.items()
+                        if key not in {"args", "then", "else"}
+                    }
+                    instruction.update(op="jump", target=target)
             if simplify:
                 instruction = _simplify(instruction)
             # Аргументы уже обработаны с прежними значениями регистров.
@@ -151,6 +162,19 @@ def _removable(instruction: dict) -> bool:
     )
 
 
+def _remove_unreachable_code(function: dict) -> None:
+    """Убрать команды после перехода/return и блоки без пути от входа."""
+    for block in function["blocks"]:
+        for index, instruction in enumerate(block["instructions"]):
+            if instruction["op"] in TERMINATORS:
+                block["instructions"] = block["instructions"][:index + 1]
+                break
+    cfg = build_cfg(function)
+    function["blocks"] = [
+        block for block in function["blocks"] if cfg[block["label"]]["reachable"]
+    ]
+
+
 def _dce(function: dict) -> None:
     changed = True
     while changed:
@@ -184,8 +208,13 @@ def optimize_module(
     """Оптимизировать копию IR. Исходный модуль, контракты и формулы сохраняются."""
     result = deepcopy(module)
     for function in result["functions"]:
+        if dce:
+            _remove_unreachable_code(function)
         if constants or simplify:
             _local_pass(function, constants=constants, simplify=simplify)
+        if constants and dce:
+            # У постоянного условия остался один переход; другая ветвь может исчезнуть.
+            _remove_unreachable_code(function)
         if cse:
             eliminate_common_expressions(function)
         if dce:

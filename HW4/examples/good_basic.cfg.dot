@@ -1,5 +1,5 @@
 digraph "cfg_main" {
   node [shape=box, fontname="monospace"];
   rankdir=TB;
-  "B0" [label="B0:\nt:9 = copy v:x  [5:9]\nt:11 = binary + t:9, 5  [5:11]\nt:13 = copy t:11  [5:15]\nv:r = copy t:13  [5:5]\nreturn v:r  [1:1]"];
+  "B0" [label="B0:\nt:6 = copy v:x  [4:9]\nt:8 = binary + t:6, 5  [4:11]\nt:10 = copy t:8  [4:15]\nv:r = copy t:10  [4:5]\nreturn v:r  [1:1]"];
 }

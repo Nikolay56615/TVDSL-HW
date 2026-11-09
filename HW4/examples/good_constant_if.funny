@@ -1,0 +1,7 @@
+main() returns r:int {
+    if (true and true) {
+        r = 7;
+    } else {
+        r = 99;
+    }
+}

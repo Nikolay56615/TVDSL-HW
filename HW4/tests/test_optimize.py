@@ -4,7 +4,7 @@ from copy import deepcopy
 import itertools
 import unittest
 
-from HW4.funnyir import IRRuntimeError, execute
+from HW4.funnyir import IRRuntimeError, compile_source, execute
 from HW4.funnyir.optimize import optimize_module
 
 
@@ -171,6 +171,60 @@ class OptimizationTests(unittest.TestCase):
         self.assertEqual([item["op"] for item in all_instructions(after)], ["jump", "return"])
         self.assert_preserved(original, [], ("result", [4]), constants=False, simplify=False)
 
+    def test_dce_removes_unreachable_block_after_return(self):
+        original = module(function([
+            block("B0", instruction("copy", dest="v:r", args=[const(7)]),
+                  instruction("return", args=[var("v:r")])),
+            block("AfterReturn",
+                  instruction("binary", dest="v:unused", operator="+", args=[const(10), const(20)]),
+                  instruction("return", args=[var("v:unused")])),
+        ]))
+        snapshot = deepcopy(original)
+        flags = dict(constants=False, simplify=False, cse=False)
+        after = optimize_module(original, **flags)
+        self.assertEqual(after["functions"][0]["blocks"], [original["functions"][0]["blocks"][0]])
+        self.assertEqual(self.outcome(original, []), ("result", [7]))
+        self.assertEqual(self.outcome(after, []), ("result", [7]))
+        self.assertEqual(optimize_module(original, dce=False, **flags), original)
+        self.assertEqual(original, snapshot)
+
+    def test_dce_removes_instructions_after_first_terminator(self):
+        for terminator in (
+            instruction("return", args=[var("v:r")]),
+            instruction("jump", target="Exit"),
+        ):
+            with self.subTest(op=terminator["op"]):
+                original = module(function([
+                    block("B0", instruction("copy", dest="v:r", args=[const(7)]), terminator,
+                          instruction("copy", dest="v:r", args=[const(99)]),
+                          instruction("return", args=[var("v:r")])),
+                    block("Exit", instruction("return", args=[var("v:r")])),
+                ]))
+                after = optimize_module(original, constants=False, simplify=False, cse=False)
+                self.assertEqual(after["functions"][0]["blocks"][0]["instructions"],
+                                 original["functions"][0]["blocks"][0]["instructions"][:2])
+                self.assert_preserved(original, [], ("result", [7]),
+                                      constants=False, simplify=False, cse=False)
+                labels = [item["label"] for item in after["functions"][0]["blocks"]]
+                self.assertEqual(labels, ["B0"] if terminator["op"] == "return" else ["B0", "Exit"])
+
+    def test_dce_keeps_blocks_reachable_from_other_branch(self):
+        original = module(function([
+            block("B0", instruction("binary", dest="t:condition", operator=">",
+                                    args=[var("v:p"), const(0)]),
+                  instruction("branch", args=[var("t:condition")], **{"then": "Early", "else": "Other"})),
+            block("Early", instruction("return", args=[const(7)])),
+            block("Other", instruction("jump", target="Join")),
+            block("Join", instruction("return", args=[const(9)])),
+        ], params=(("p", "int"),)))
+        after = optimize_module(original, constants=False, simplify=False, cse=False)
+        self.assertEqual([item["label"] for item in after["functions"][0]["blocks"]],
+                         ["B0", "Early", "Other", "Join"])
+        for argument, result in ((1, 7), (0, 9)):
+            with self.subTest(argument=argument):
+                self.assert_preserved(original, [argument], ("result", [result]),
+                                      constants=False, simplify=False, cse=False)
+
     def test_dce_keeps_uninitialized_pure_read_and_its_position(self):
         original = linear(instruction("unary", dest="t:dead", operator="-", args=[var("v:missing")]), instruction("return", args=[const(4)]))
         self.assertEqual(len(all_instructions(optimize_module(original))), 2)
@@ -257,6 +311,91 @@ class OptimizationTests(unittest.TestCase):
             with self.subTest(**flags):
                 self.assert_preserved(original, [2147483647], **flags)
         self.assertEqual(optimize_module(original, constants=False, simplify=False, cse=False, dce=False), original)
+
+    def test_constant_conditions_remove_unreachable_branches(self):
+        for condition, expected in (
+            ("true", 7), ("false", 99), ("true and true", 7),
+            ("false or false", 99), ("1 < 2", 7), ("2 < 1", 99),
+            ("not false", 7), ("true -> false", 99),
+        ):
+            with self.subTest(condition=condition):
+                result = compile_source(
+                    "main() returns r:int {if(" + condition + ")r=7;else r=99;}")
+                self.assertTrue(result.ok, result.diagnostics)
+                self.assertEqual(execute(result.before), [expected])
+                self.assertEqual(execute(result.after), [expected])
+                instructions = all_instructions(result.after)
+                self.assertFalse(any(item["op"] == "branch" for item in instructions))
+                rejected = 99 if expected == 7 else 7
+                self.assertFalse(any(item["op"] == "copy" and item["args"] == [const(rejected)]
+                                     for item in instructions))
+                self.assertLess(len(result.after["functions"][0]["blocks"]),
+                                len(result.before["functions"][0]["blocks"]))
+
+    def test_constant_branches_preserve_errors_and_short_circuiting(self):
+        for condition, then_value, else_value, expected in (
+            ("true", "7", "1/0", ("result", [7])),
+            ("false", "1/0", "7", ("result", [7])),
+            ("true", "1/0", "7", ("error", "division_by_zero")),
+            ("true or 1/0>0", "7", "99", ("result", [7])),
+            ("false and 1/0>0", "7", "99", ("result", [99])),
+            ("1/0>0 or true", "7", "99", ("error", "division_by_zero")),
+        ):
+            with self.subTest(condition=condition, then_value=then_value):
+                result = compile_source("main() returns r:int {if(" + condition + ")r=" +
+                                        then_value + ";else r=" + else_value + ";}")
+                self.assertTrue(result.ok, result.diagnostics)
+                before, after = self.outcome(result.before, []), self.outcome(result.after, [])
+                self.assertEqual(before, after)
+                self.assertEqual(before[:len(expected)], expected)
+
+    def test_constant_branches_respect_flags_and_keep_unknown_conditions(self):
+        source = "main() returns r:int {if(true and true)r=7;else r=99;}"
+        for constants, dce in itertools.product((False, True), repeat=2):
+            with self.subTest(constants=constants, dce=dce):
+                result = compile_source(source, constants=constants, dce=dce)
+                self.assertTrue(result.ok, result.diagnostics)
+                has_branch = any(item["op"] == "branch" for item in all_instructions(result.after))
+                self.assertEqual(has_branch, not constants)
+                if constants and dce:
+                    self.assertLess(len(result.after["functions"][0]["blocks"]),
+                                    len(result.before["functions"][0]["blocks"]))
+                else:
+                    self.assertEqual(len(result.after["functions"][0]["blocks"]),
+                                     len(result.before["functions"][0]["blocks"]))
+                self.assertEqual(execute(result.before), execute(result.after))
+        disabled = compile_source(source, optimize=False)
+        self.assertEqual(disabled.before, disabled.after)
+
+        unknown = compile_source("main(x:int) returns r:int {if(x>0)r=7;else r=99;}")
+        self.assertTrue(unknown.ok, unknown.diagnostics)
+        self.assertTrue(any(item["op"] == "branch" for item in all_instructions(unknown.after)))
+        for argument, expected in ((1, 7), (0, 99)):
+            self.assertEqual(execute(unknown.before, arguments=[argument]), [expected])
+            self.assertEqual(execute(unknown.after, arguments=[argument]), [expected])
+
+    def test_constant_branch_keeps_metadata_and_requires_boolean_constant(self):
+        for value in (True, False, 1, 0):
+            with self.subTest(value=value, value_type=type(value).__name__):
+                branch = instruction("branch", args=[const(value)], note="condition",
+                                     **{"then": "Yes", "else": "No"})
+                original = module(function([
+                    block("B0", branch),
+                    block("Yes", instruction("return", args=[const(7)])),
+                    block("No", instruction("return", args=[const(99)])),
+                ]))
+                snapshot = deepcopy(original)
+                after = optimize_module(original, simplify=False, cse=False, dce=False)
+                actual = after["functions"][0]["blocks"][0]["instructions"][0]
+                if type(value) is bool:
+                    self.assertEqual(actual, instruction("jump", target="Yes" if value else "No",
+                                                         note="condition"))
+                    self.assertEqual(self.outcome(after, []), ("result", [7 if value else 99]))
+                else:
+                    self.assertEqual(actual, branch)
+                    self.assert_preserved(original, [], ("error", "invalid_ir", {"line": 7, "col": 3}),
+                                          simplify=False, cse=False, dce=False)
+                self.assertEqual(original, snapshot)
 
 
 if __name__ == "__main__":

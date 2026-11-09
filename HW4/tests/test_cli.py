@@ -112,6 +112,32 @@ class CLITests(unittest.TestCase):
         self.assertEqual(process.returncode, 0, process.stderr)
         self.assertEqual(json.loads(process.stdout), [9])
 
+    def test_run_text_format_is_readable(self):
+        process = self.run_cli("run", str(ROOT / "HW4" / "examples" / "good_loop.funny"),
+                               "--args", "[10]", "--format", "text")
+        self.assertEqual(process.returncode, 0, process.stderr)
+        self.assertEqual(process.stdout.splitlines(), ["Результат: [55]"])
+
+        process = self.run_cli("run", "--text", SOURCE, "--args", "[8]",
+                               "--compare", "--format", "text")
+        self.assertEqual(process.returncode, 0, process.stderr)
+        self.assertEqual(process.stdout.splitlines(),
+                         ["ДО: Результат: [9]", "ПОСЛЕ: Результат: [9]",
+                          "Сравнение: совпадают"])
+
+    def test_run_text_format_shows_source_and_runtime_errors(self):
+        process = self.run_cli("run", "--text", "main() returns r:int {r=missing;}",
+                               "--format", "text")
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("semantic [unknown_variable]", process.stdout)
+        self.assertNotIn("diagnostics", process.stdout)
+
+        process = self.run_cli("run", "--text", "main() returns r:int {r=1/0;}",
+                               "--format", "text")
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("runtime [division_by_zero]", process.stdout)
+        self.assertNotIn('"error"', process.stdout)
+
     def test_run_before(self):
         process = self.run_cli("run", "--text", CONSTANT, "--before")
         self.assertEqual(process.returncode, 0, process.stderr)

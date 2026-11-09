@@ -43,6 +43,17 @@ def diagnostic_text(item):
         item.get("col", "?"), item.get("message", ""))
 
 
+def runtime_text(item):
+    """Показать результат или ошибку исполнения без служебного JSON."""
+    if "result" in item:
+        return "Результат: " + json.dumps(item["result"], ensure_ascii=False)
+    error = item["error"]
+    pos = error.get("pos", {})
+    return "runtime [%s] %s:%s: %s" % (
+        error.get("code", "error"), pos.get("line", "?"), pos.get("col", "?"),
+        error.get("message", ""))
+
+
 def compile_input(args):
     source = args.text if args.text is not None else Path(args.file).read_text(encoding="utf-8-sig")
     return compile_source(source, optimize=not args.no_opt, constants=not args.no_constants,
@@ -130,7 +141,10 @@ def cmd_run(args):
     arguments = json.loads(args.args)
     result = compile_input(args)
     if not result.ok:
-        write_output(json_text({"diagnostics": result.to_dict()["diagnostics"]}), args.out)
+        diagnostics = result.to_dict()["diagnostics"]
+        output = (json_text({"diagnostics": diagnostics}) if args.format == "json" else
+                  "\n".join(diagnostic_text(item) for item in diagnostics) + "\n")
+        write_output(output, args.out)
         return 1
     validate_arguments(result.before, args.function, arguments)
     export_graphs(args, result)
@@ -138,12 +152,23 @@ def cmd_run(args):
         before = outcome(result.before, args.function, arguments, args.max_steps, args.max_depth)
         after = outcome(result.after, args.function, arguments, args.max_steps, args.max_depth)
         equal, comparison = compare_outcomes(before, after)
-        write_output(json_text({"before": before, "after": after,
-                                "equivalent": equal, "comparison": comparison}), args.out)
+        document = {"before": before, "after": after,
+                    "equivalent": equal, "comparison": comparison}
+        if args.format == "text":
+            comparison_text = {"equal": "совпадают", "different": "различаются",
+                               "inconclusive": "не установлено из-за лимита"}[comparison]
+            output = ("ДО: " + runtime_text(before) + "\n" +
+                      "ПОСЛЕ: " + runtime_text(after) + "\n" +
+                      "Сравнение: " + comparison_text + "\n")
+        else:
+            output = json_text(document)
+        write_output(output, args.out)
         return 0 if equal is True else 1
     actual = outcome(result.before if args.before else result.after, args.function, arguments,
                      args.max_steps, args.max_depth)
-    write_output(json_text(actual["result"] if "result" in actual else actual), args.out)
+    output = (runtime_text(actual) + "\n" if args.format == "text" else
+              json_text(actual["result"] if "result" in actual else actual))
+    write_output(output, args.out)
     return 0 if "result" in actual else 1
 
 
@@ -316,6 +341,8 @@ def main(argv=None):
     add_input_options(run)
     run.add_argument("--function", default="main")
     run.add_argument("--args", default="[]", help="аргументы в JSON, например [1,[2,3]]")
+    run.add_argument("--format", choices=("text", "json"), default="json",
+                     help="text — читаемый результат; json — машинный формат (по умолчанию)")
     run.add_argument("--compare", action="store_true", help="сравнить исполнение до и после")
     run.add_argument("--before", action="store_true", help="исполнить IR до оптимизаций")
     run.add_argument("--max-steps", type=positive_integer, default=100000)

@@ -2,6 +2,7 @@
   "examples": [
     {"file":"good_basic.funny","function":"main","args":[7],"result":[12]},
     {"file":"good_cse.funny","function":"main","args":[2,3],"result":[10]},
+    {"file":"good_constant_if.funny","function":"main","args":[],"result":[7]},
     {"file":"good_branches.funny","function":"main","args":[-7],"result":[7]},
     {"file":"good_loop.funny","function":"main","args":[10],"result":[55]},
     {"file":"good_arrays.funny","function":"main","args":[[1,2,3]],"result":[[9,2,3],1]},
