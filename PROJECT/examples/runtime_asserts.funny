@@ -1,0 +1,7 @@
+nonnegative_head(a:int[]) => length(a) > 0 and a[0] >= 0;
+
+main(a:int[], n:int) returns r:int {
+    assert nonnegative_head(a);
+    assume n >= 0;
+    r = n + 1;
+}

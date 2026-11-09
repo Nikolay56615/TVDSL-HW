@@ -1,0 +1,16 @@
+{
+  "inputs": ["v:x"],
+  "before": {
+    "label": "B0",
+    "instructions": [
+      {"op": "binary", "operator": "/", "dest": "t:0", "args": [{"const": 0}, {"var": "v:x"}]},
+      {"op": "return", "args": [{"var": "t:0"}]}
+    ]
+  },
+  "after": {
+    "label": "B0",
+    "instructions": [
+      {"op": "return", "args": [{"const": 0}]}
+    ]
+  }
+}
