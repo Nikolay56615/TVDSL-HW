@@ -1,0 +1,16 @@
+minmax(a:int[]) requires length(a) > 0 returns mn:int, mx:int {
+    mn = a[0];
+    mx = a[0];
+    i = 1;
+    while (i < length(a)) {
+        if (a[i] < mn) mn = a[i];
+        if (a[i] > mx) mx = a[i];
+        i = i + 1;
+    }
+}
+
+normalize(a:int[]) requires length(a) >= 2 returns b:int[] {
+    b = a; // копия
+    mn, mx = minmax(b);
+    if (mx != mn) { b[0] = mn; b[1] = mx; }
+}

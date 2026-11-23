@@ -1,0 +1,3 @@
+main() returns r:int {
+    r = foo(1,2); // foo не определена
+}

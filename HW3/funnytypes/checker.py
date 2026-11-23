@@ -45,8 +45,9 @@ _LOGICAL = {"and", "or", "->"}
 
 
 class _Checker:
-    def __init__(self, ast):
+    def __init__(self, ast, implicit_locals=False):
         self.ast = ast
+        self.implicit_locals = implicit_locals
         self.diagnostics = []
         self.reported = set()
         self.callables = {"length": CallableSymbol("length", "Function", [ARRAY], [INT])}
@@ -125,6 +126,9 @@ class _Checker:
             self._expect(self._expression(predicate, params, "predicate"), BOOL, predicate)
             return
 
+        if self.implicit_locals:
+            self._collect_assignment_locals(declaration)
+
         # В ensures доступны параметры и возвращаемые переменные.
         results = Scope(params)
         for result in declaration.get("returns", []):
@@ -148,6 +152,32 @@ class _Checker:
                 self._error(symbol.declaration, "unresolved_type",
                             "Не удалось вывести тип локальной переменной %r: нет корректного присваивания"
                             % symbol.name)
+
+    @staticmethod
+    def _collect_assignment_locals(function):
+        """Собрать локальные переменные из левых частей присваиваний проекта."""
+        locals_ = function.setdefault("locals", [])
+        known = {item["name"] for group in ("params", "returns", "locals")
+                 for item in function.get(group, [])}
+        statements = [function.get("body")]
+        while statements:
+            statement = statements.pop()
+            if not isinstance(statement, dict):
+                continue
+            kind = statement.get("kind")
+            if kind == "Assign":
+                for target in statement.get("targets", []):
+                    name = target["name"]
+                    if name not in known:
+                        locals_.append({"kind": "VariableDecl", "name": name, "type": None,
+                                        "pos": deepcopy(target.get("pos", {}))})
+                        known.add(name)
+            elif kind == "Block":
+                statements.extend(reversed(statement.get("statements", [])))
+            elif kind == "If":
+                statements.extend([statement.get("else"), statement.get("then")])
+            elif kind == "While":
+                statements.append(statement.get("body"))
 
     def run(self):
         declarations = self.ast.get("declarations", [])
@@ -349,6 +379,6 @@ class _Checker:
             self._error(node, "unsupported_node", "Неизвестный оператор %r" % kind)
 
 
-def check_ast(ast):
+def check_ast(ast, *, implicit_locals=False):
     """Проверить копию дерева HW2 и вернуть её с типами и списком ошибок."""
-    return _Checker(deepcopy(ast)).run()
+    return _Checker(deepcopy(ast), implicit_locals).run()

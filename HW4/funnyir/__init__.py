@@ -61,14 +61,17 @@ def _compile(checked, optimize, constants, simplify, cse, dce):
 
 
 def compile_source(source, *, optimize=True, constants=True, simplify=True,
-                   cse=True, dce=True, table=None):
+                   cse=True, dce=True, table=None, implicit_locals=False):
     """Исходный текст -> две версии IR и результаты их анализа."""
-    return _compile(check(source, table), optimize, constants, simplify, cse, dce)
+    checked = check(source, table, implicit_locals=implicit_locals)
+    return _compile(checked, optimize, constants, simplify, cse, dce)
 
 
-def compile_ast(ast, *, optimize=True, constants=True, simplify=True, cse=True, dce=True):
+def compile_ast(ast, *, optimize=True, constants=True, simplify=True, cse=True, dce=True,
+                implicit_locals=False):
     """Проверить копию AST HW3 и получить IR, не меняя переданное дерево."""
-    return _compile(check_ast(ast), optimize, constants, simplify, cse, dce)
+    checked = check_ast(ast, implicit_locals=implicit_locals)
+    return _compile(checked, optimize, constants, simplify, cse, dce)
 
 
 __all__ = ["compile_source", "compile_ast", "CompilationResult", "execute", "IRRuntimeError"]

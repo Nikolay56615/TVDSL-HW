@@ -1,0 +1,9 @@
+swap(a:int, b:int) returns x:int, y:int {
+    x = b;
+    y = a;
+}
+
+main() returns r:int {
+    x, y = swap(1, 2);
+    r = x - y;
+}

@@ -1,0 +1,3 @@
+foo(x:int) returns r:int {
+    r = length(x); // length применено к не-массиву
+}

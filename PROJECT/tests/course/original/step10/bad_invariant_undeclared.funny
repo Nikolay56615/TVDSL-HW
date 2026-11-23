@@ -1,0 +1,10 @@
+sum(n:int) returns r:int {
+    i = 0;
+    r = 0;
+    while (i < n)
+        invariant inv_not_defined > 0 // неизвестный идентификатор
+    {
+        r = r + i;
+        i = i + 1;
+    }
+}

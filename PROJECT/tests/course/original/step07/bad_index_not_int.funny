@@ -1,0 +1,4 @@
+upd(a:int[]) returns b:int[] {
+    b = a;
+    b[a] = 1; // индекс не int
+}

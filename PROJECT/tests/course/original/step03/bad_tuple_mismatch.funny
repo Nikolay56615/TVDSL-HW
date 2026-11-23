@@ -1,0 +1,6 @@
+foo(x:int) returns a:int, b:int { a = x; b = x+1; }
+
+main() returns r:int {
+    a = foo(1); // левых переменных меньше, чем возвращаемых
+    r = 0;
+}

@@ -1,0 +1,7 @@
+add(a:int, b:int) returns r:int {
+    r = a + b;
+}
+
+main() returns r:int {
+    r = add(2, 3);
+}

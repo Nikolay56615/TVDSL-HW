@@ -1,0 +1,3 @@
+fact(n:int) requires n >= 0 returns r:int {
+    if (n == 0) r = 1; else r = n * fact(n - 1);
+}

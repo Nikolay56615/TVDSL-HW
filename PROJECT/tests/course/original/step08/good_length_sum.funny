@@ -1,0 +1,3 @@
+sum2(a:int[]) requires length(a) >= 2 returns r:int {
+    r = a[0] + a[length(a)-1];
+}

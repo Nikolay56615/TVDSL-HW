@@ -1,0 +1,6 @@
+is_sorted(a:int[], l:int, r:int) => true;
+
+check(a:int[]) returns ok:int {
+    ok = 1;
+    assert is_sorted(a); // неверное число аргументов
+}

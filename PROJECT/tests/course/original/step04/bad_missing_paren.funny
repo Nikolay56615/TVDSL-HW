@@ -1,0 +1,5 @@
+main() returns r:int {
+    if (r > 0 {
+        r = 1;
+    }
+}

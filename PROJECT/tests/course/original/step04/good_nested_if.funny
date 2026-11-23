@@ -1,0 +1,4 @@
+choose(x:int, y:int) returns r:int {
+    if (x > y) if (x > 0) r = x; else r = y;
+    else r = y;
+}

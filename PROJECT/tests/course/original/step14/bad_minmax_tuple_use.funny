@@ -1,0 +1,6 @@
+minmax(a:int[]) returns mn:int, mx:int { mn = 0; mx = 0; }
+
+normalize(a:int[]) returns b:int[] {
+    b = a;
+    t = minmax(b); // многозначный возврат присваивается одной переменной
+}

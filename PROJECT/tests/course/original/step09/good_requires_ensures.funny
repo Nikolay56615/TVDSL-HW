@@ -1,0 +1,3 @@
+incpos(x:int) requires x >= 0 returns y:int ensures y > x {
+    y = x + 1;
+}

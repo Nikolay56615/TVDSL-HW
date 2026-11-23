@@ -9,9 +9,9 @@ import subprocess
 import sys
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 
-from HW4.funnyir import compile_source
 from HW4.funnyir.operations import i32
 
+from . import compile_source
 from .backend import RUNTIME_CLASSES, emit_class
 from .translation import build_query, solve_query
 

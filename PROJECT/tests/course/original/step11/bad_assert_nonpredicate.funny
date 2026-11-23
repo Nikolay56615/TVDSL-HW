@@ -1,0 +1,4 @@
+foo(x:int) returns r:int {
+    r = x + 1;
+    assert r; // не логическое выражение в assert
+}

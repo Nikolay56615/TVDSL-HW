@@ -1,0 +1,3 @@
+head(a:int[]) returns h:int {
+    h = a[0];
+}

@@ -1,0 +1,7 @@
+countdown(n:int) returns r:int {
+    r = 0;
+    while (n > 0) {
+        r = r + 1;
+        n = n - 1;
+    }
+}

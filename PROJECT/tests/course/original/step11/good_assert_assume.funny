@@ -1,0 +1,5 @@
+safe_div(x:int, y:int) returns r:int {
+    assume y != 0;
+    r = x / y;
+    assert r * y == x;
+}
