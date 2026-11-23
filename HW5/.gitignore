@@ -1,0 +1,9 @@
+/.tools/
+/results/
+/docs/
+/REPORT.md
+pan
+pan.exe
+pan.[bchmopt]
+_spin_nvr.tmp
+*.trail

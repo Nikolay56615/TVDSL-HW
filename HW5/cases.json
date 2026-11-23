@@ -1,0 +1,8 @@
+{
+  "correct": {"define": null, "fails": []},
+  "spurious": {"define": "SPURIOUS_OUTCOME", "fails": ["requested", "next_request"]},
+  "double": {"define": "DOUBLE_OUTCOME", "fails": ["exclusive"]},
+  "overflow": {"define": "RETRY_OVERFLOW", "fails": ["retry_bound"]},
+  "stalled": {"define": "STALLED", "fails": ["response"]},
+  "no_reset": {"define": "NO_RESET", "fails": ["next_request"]}
+}
